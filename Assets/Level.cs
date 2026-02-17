@@ -351,7 +351,7 @@ public class Level : MonoBehaviour
                         break;
                     case LevelParts.Start:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiatePiece(playerPrefab, i, j, t, p, shift);
+                        InstantiateCenter(playerPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.End:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
@@ -359,7 +359,7 @@ public class Level : MonoBehaviour
                         break;
                     case LevelParts.Enemy:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiatePiece(enemyPrefab, i, j, t, p, shift);
+                        InstantiateCenter(enemyPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Health:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
