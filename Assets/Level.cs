@@ -336,7 +336,7 @@ public class Level : MonoBehaviour
         // Place the generated level.
         Transform t = transform;
         Vector3 p = t.position;
-        float shift = size / 2f * pieceSpacing;
+        float shift = (size - 1) / 2f * pieceSpacing;
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -344,30 +344,30 @@ public class Level : MonoBehaviour
                 switch (level[i, j])
                 {
                     case LevelParts.Floor:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         break;
                     case LevelParts.Wall:
                         InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, j, t, p, shift);
                         break;
                     case LevelParts.Start:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         InstantiatePiece(playerPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.End:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         InstantiatePiece(coinPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Enemy:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         InstantiatePiece(enemyPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Health:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiatePiece(healthPrefab, i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(healthPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Weapon:
-                        InstantiatePiece(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiatePiece(weaponPrefab, i, j, t, p, shift);
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        InstantiateFixed(weaponPrefab, i, j, t, p, shift);
                         break;
                 }
             }
@@ -388,6 +388,36 @@ public class Level : MonoBehaviour
     }
     
     /// <summary>
+    /// Instantiate a prefab at a random, fixed rotation.
+    /// </summary>
+    /// <param name="prefab">The prefab to spawn.</param>
+    /// <param name="i">The first index.</param>
+    /// <param name="j">The second index.</param>
+    /// <param name="t">The transform of this.</param>
+    /// <param name="p">The position of this.</param>
+    /// <param name="shift">How much to shift each piece for centering.</param>
+    private void InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    {
+        GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
+        go.transform.localEulerAngles = new(0, 90f * Random.Range(0, 4), 0);
+    }
+    
+    /// <summary>
+    /// Instantiate a prefab which looks towards the center position, passed as the "p" parameter.
+    /// </summary>
+    /// <param name="prefab">The prefab to spawn.</param>
+    /// <param name="i">The first index.</param>
+    /// <param name="j">The second index.</param>
+    /// <param name="t">The transform of this.</param>
+    /// <param name="p">The position of this.</param>
+    /// <param name="shift">How much to shift each piece for centering.</param>
+    private void InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    {
+        GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
+        // TODO - Rotate.
+    }
+    
+    /// <summary>
     /// Instantiate a piece.
     /// </summary>
     /// <param name="prefab">The prefab to spawn.</param>
@@ -396,7 +426,7 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
-    /// <returns></returns>
+    /// <returns>The spawned instance.</returns>
     private GameObject InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
         GameObject go = Instantiate(prefab, t);
