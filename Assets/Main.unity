@@ -156,11 +156,11 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 401a57798e7fa084b91c5b950cf1b13d, type: 3}
   wallPrefabs:
   - {fileID: 919132149155446097, guid: 5441015f17ceb8d46bed111edec2d906, type: 3}
-  playerPrefab: {fileID: 0}
-  enemyPrefab: {fileID: 0}
-  coinPrefab: {fileID: 0}
-  healthPrefab: {fileID: 0}
-  weaponPrefab: {fileID: 0}
+  playerPrefab: {fileID: 919132149155446097, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+  enemyPrefab: {fileID: 919132149155446097, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+  coinPrefab: {fileID: 919132149155446097, guid: cbd328403823a764ab1d27c2d5392145, type: 3}
+  healthPrefab: {fileID: 919132149155446097, guid: 258f738a955542f458062c26c76f5313, type: 3}
+  weaponPrefab: {fileID: 919132149155446097, guid: f0bfae49c9155dc4cb72064868733024, type: 3}
 --- !u!4 &659273211
 Transform:
   m_ObjectHideFlags: 0

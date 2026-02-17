@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -27,6 +26,14 @@ public class Level : MonoBehaviour
     [SerializeField]
     private float wallPercent = 0.1f;
     
+    /// <summary>
+    /// The number of enemies to attempt to spawn.
+    /// </summary>
+    [Tooltip("The number of enemies to attempt to spawn.")]
+    [Min(0)]
+    [SerializeField]
+    private int desiredEnemies = 3;
+
     /// <summary>
     /// The spacing of pieces of the level.
     /// </summary>
@@ -105,20 +112,207 @@ public class Level : MonoBehaviour
     {
         LevelParts[,] level = new LevelParts[size, size];
         
+        // Initialize all spaces as floors
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                // TODO - Implement a full level design.
-                //  1 - There must always be a player/start and a coin/end in the level. They should each be in a distinct corner of the level.
-                //  2 - If there are any enemies in the level, there must be at least one weapon and one health pick-up in the level.
-                //  3 - Attempt to place up to the desired number of enemies, spawning as far away from the player as possible. If there are no more valid spaces for enemies, stop spawning them.
-                //  4 - Attempt to fill the desired percentage of floors as walls, ensuring all traversable areas (all other types of parts) are fully-connected and reachable from each other. If there are no more valid spaces for walls, stop spawning them.
                 level[i, j] = LevelParts.Floor;
             }
         }
         
+        // 1. Place Start and End in distinct corners
+        Vector2Int[] corners = {
+            new Vector2Int(0, 0),
+            new Vector2Int(0, size - 1),
+            new Vector2Int(size - 1, 0),
+            new Vector2Int(size - 1, size - 1)
+        };
+        
+        int startIndex = Random.Range(0, 4);
+        int endIndex = Random.Range(0, 4);
+        while (endIndex == startIndex)
+        {
+            endIndex = Random.Range(0, 4);
+        }
+        
+        Vector2Int startPos = corners[startIndex];
+        Vector2Int endPos = corners[endIndex];
+        
+        level[startPos.x, startPos.y] = LevelParts.Start;
+        level[endPos.x, endPos.y] = LevelParts.End;
+        
+        // 4. Place Walls ensuring full connectivity
+        int totalCells = size * size;
+        int targetWalls = Mathf.FloorToInt(totalCells * wallPercent);
+        int wallsPlaced = 0;
+        int maxWallAttempts = targetWalls * 10; // Prevent infinite loops
+        int attempts = 0;
+        int currentTraversable = totalCells;
+        
+        while (wallsPlaced < targetWalls && attempts < maxWallAttempts)
+        {
+            attempts++;
+            int rx = Random.Range(0, size);
+            int ry = Random.Range(0, size);
+            
+            // Only place walls on empty floors
+            if (level[rx, ry] == LevelParts.Floor)
+            {
+                level[rx, ry] = LevelParts.Wall;
+                currentTraversable--;
+                
+                // If the level is still fully connected, keep the wall
+                if (IsConnected(level, startPos, currentTraversable))
+                {
+                    wallsPlaced++;
+                }
+                else
+                {
+                    // Revert the wall if it breaks the path
+                    level[rx, ry] = LevelParts.Floor;
+                    currentTraversable++;
+                }
+            }
+        }
+        
+        // 3. Place Enemies as far away from the player as possible
+        // Calculate the true walking distance from the start position using BFS
+        int[,] distances = new int[size, size];
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                distances[i, j] = -1;
+            }
+        }
+        
+        Queue<Vector2Int> q = new Queue<Vector2Int>();
+        q.Enqueue(startPos);
+        distances[startPos.x, startPos.y] = 0;
+        
+        int[] dx = { 0, 0, -1, 1 };
+        int[] dy = { -1, 1, 0, 0 };
+        
+        while (q.Count > 0)
+        {
+            Vector2Int curr = q.Dequeue();
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = curr.x + dx[i];
+                int ny = curr.y + dy[i];
+                
+                if (nx >= 0 && nx < size && ny >= 0 && ny < size)
+                {
+                    if (level[nx, ny] != LevelParts.Wall && distances[nx, ny] == -1)
+                    {
+                        distances[nx, ny] = distances[curr.x, curr.y] + 1;
+                        q.Enqueue(new Vector2Int(nx, ny));
+                    }
+                }
+            }
+        }
+        
+        // Gather all remaining floors and their distances from the player
+        List<KeyValuePair<Vector2Int, int>> floorDistances = new();
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if (level[i, j] == LevelParts.Floor)
+                {
+                    floorDistances.Add(new KeyValuePair<Vector2Int, int>(new Vector2Int(i, j), distances[i, j]));
+                }
+            }
+        }
+        
+        // Sort floors by distance descending (furthest first)
+        floorDistances.Sort((a, b) => b.Value.CompareTo(a.Value));
+        
+        int enemiesPlaced = 0;
+        for (int i = 0; i < desiredEnemies && i < floorDistances.Count; i++)
+        {
+            Vector2Int pos = floorDistances[i].Key;
+            level[pos.x, pos.y] = LevelParts.Enemy;
+            enemiesPlaced++;
+        }
+        
+        // 2. Place Weapon and Health if any enemies were placed
+        if (enemiesPlaced > 0)
+        {
+            List<Vector2Int> remainingFloors = new();
+            for (int i = enemiesPlaced; i < floorDistances.Count; i++)
+            {
+                remainingFloors.Add(floorDistances[i].Key);
+            }
+            
+            // Shuffle the remaining floors for random item placement
+            for (int i = 0; i < remainingFloors.Count; i++)
+            {
+                int swap = Random.Range(i, remainingFloors.Count);
+                (remainingFloors[i], remainingFloors[swap]) = (remainingFloors[swap], remainingFloors[i]);
+            }
+            
+            if (remainingFloors.Count > 0)
+            {
+                Vector2Int pos = remainingFloors[0];
+                level[pos.x, pos.y] = LevelParts.Weapon;
+                remainingFloors.RemoveAt(0);
+            }
+            
+            if (remainingFloors.Count > 0)
+            {
+                Vector2Int pos = remainingFloors[0];
+                level[pos.x, pos.y] = LevelParts.Health;
+                remainingFloors.RemoveAt(0);
+            }
+        }
+        
         return level;
+    }
+    
+    /// <summary>
+    /// Validates if all traversable spaces in the grid are fully connected.
+    /// </summary>
+    /// <param name="grid">The current state of the level grid.</param>
+    /// <param name="startPos">A known traversable starting position.</param>
+    /// <param name="targetCount">The expected number of reachable cells.</param>
+    /// <returns>True if every non-wall piece can be reached.</returns>
+    private bool IsConnected(LevelParts[,] grid, Vector2Int startPos, int targetCount)
+    {
+        int s = grid.GetLength(0);
+        bool[,] visited = new bool[s, s];
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        
+        queue.Enqueue(startPos);
+        visited[startPos.x, startPos.y] = true;
+        int reachableCount = 1;
+        
+        int[] dx = { 0, 0, -1, 1 };
+        int[] dy = { -1, 1, 0, 0 };
+        
+        while (queue.Count > 0)
+        {
+            Vector2Int curr = queue.Dequeue();
+            
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = curr.x + dx[i];
+                int ny = curr.y + dy[i];
+                
+                if (nx >= 0 && nx < s && ny >= 0 && ny < s)
+                {
+                    if (!visited[nx, ny] && grid[nx, ny] != LevelParts.Wall)
+                    {
+                        visited[nx, ny] = true;
+                        reachableCount++;
+                        queue.Enqueue(new Vector2Int(nx, ny));
+                    }
+                }
+            }
+        }
+        
+        return reachableCount == targetCount;
     }
     
     /// <summary>
@@ -207,6 +401,7 @@ public class Level : MonoBehaviour
     {
         GameObject go = Instantiate(prefab, t);
         go.transform.position = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
+        go.name = prefab.name;
         _parts.Add(go);
         return go;
     }
