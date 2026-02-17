@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 659273211}
   - component: {fileID: 659273210}
+  - component: {fileID: 659273212}
   m_Layer: 0
   m_Name: Level
   m_TagString: Untagged
@@ -156,12 +157,13 @@ MonoBehaviour:
   - {fileID: 5228766014177188182, guid: 2d9cabd19edce104b89d813ff9ee1354, type: 3}
   - {fileID: 3776457079191625595, guid: 4437381268562ee438cdffe996d2a3f0, type: 3}
   wallPrefabs:
-  - {fileID: 919132149155446097, guid: 5441015f17ceb8d46bed111edec2d906, type: 3}
+  - {fileID: 5521304086427311147, guid: d27e240845ead0b4ab47689bfc25eaf3, type: 3}
   playerPrefab: {fileID: 3020385601691468091, guid: 5ef37596a1631474baba3a67e6ad9d1b, type: 3}
   enemyPrefab: {fileID: 32065200315984136, guid: 353514b755a9a4646aff6e1e8e07dace, type: 3}
   coinPrefab: {fileID: 709328490669782622, guid: 586d1922a3a5a9a4c80ceab6913bd5d8, type: 3}
   healthPrefab: {fileID: 5150058218350891695, guid: 1c1c8d08a644e7443a4325ac0bc1de54, type: 3}
   weaponPrefab: {fileID: 4320876073477296290, guid: 6cb0ef883270b854ba4219d0103d0d7e, type: 3}
+  surface: {fileID: 659273212}
 --- !u!4 &659273211
 Transform:
   m_ObjectHideFlags: 0
@@ -177,6 +179,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &659273212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 659273209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.083333336
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
 --- !u!1 &1667030701
 GameObject:
   m_ObjectHideFlags: 0

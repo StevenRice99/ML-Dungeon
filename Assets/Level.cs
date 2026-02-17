@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
 /// <summary>
@@ -7,6 +9,7 @@ using Random = UnityEngine.Random;
 /// </summary>
 [SelectionBase]
 [DisallowMultipleComponent]
+[RequireComponent(typeof(NavMeshSurface))]
 public class Level : MonoBehaviour
 {
     /// <summary>
@@ -92,15 +95,53 @@ public class Level : MonoBehaviour
     private GameObject weaponPrefab;
     
     /// <summary>
+    /// The <see cref="NavMeshSurface"/> surface to bake for this.
+    /// </summary>
+    [HideInInspector]
+    [Tooltip("The navigation mesh surface to bake for this.")]
+    [SerializeField]
+    private NavMeshSurface surface;
+    
+    /// <summary>
     /// All spawned parts.
     /// </summary>
     private readonly List<GameObject> _parts = new();
+    
+    /// <summary>
+    /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
+    /// </summary>
+    private void OnValidate()
+    {
+        GetNavMeshSurface();
+    }
+    
+    /// <summary>
+    /// Get the <see cref="surface"/>.
+    /// </summary>
+    private void GetNavMeshSurface()
+    {
+        if (surface == null || surface.gameObject != gameObject)
+        {
+            surface = GetComponent<NavMeshSurface>();
+        }
+        
+        if (!surface)
+        {
+            return;
+        }
+        
+        // Only get the current volume.
+        surface.collectObjects = CollectObjects.Children;
+        surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        surface.buildHeightMesh = true;
+    }
     
     /// <summary>
     /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
     /// </summary>
     private void Start()
     {
+        GetNavMeshSurface();
         PlaceLevel(GenerateLevel());
     }
     
@@ -123,10 +164,10 @@ public class Level : MonoBehaviour
         
         // 1. Place Start and End in distinct corners
         Vector2Int[] corners = {
-            new Vector2Int(0, 0),
-            new Vector2Int(0, size - 1),
-            new Vector2Int(size - 1, 0),
-            new Vector2Int(size - 1, size - 1)
+            new(0, 0),
+            new(0, size - 1),
+            new(size - 1, 0),
+            new(size - 1, size - 1)
         };
         
         int startIndex = Random.Range(0, 4);
@@ -187,7 +228,7 @@ public class Level : MonoBehaviour
             }
         }
         
-        Queue<Vector2Int> q = new Queue<Vector2Int>();
+        Queue<Vector2Int> q = new();
         q.Enqueue(startPos);
         distances[startPos.x, startPos.y] = 0;
         
@@ -207,7 +248,7 @@ public class Level : MonoBehaviour
                     if (level[nx, ny] != LevelParts.Wall && distances[nx, ny] == -1)
                     {
                         distances[nx, ny] = distances[curr.x, curr.y] + 1;
-                        q.Enqueue(new Vector2Int(nx, ny));
+                        q.Enqueue(new(nx, ny));
                     }
                 }
             }
@@ -221,7 +262,7 @@ public class Level : MonoBehaviour
             {
                 if (level[i, j] == LevelParts.Floor)
                 {
-                    floorDistances.Add(new KeyValuePair<Vector2Int, int>(new Vector2Int(i, j), distances[i, j]));
+                    floorDistances.Add(new(new(i, j), distances[i, j]));
                 }
             }
         }
@@ -278,11 +319,11 @@ public class Level : MonoBehaviour
     /// <param name="startPos">A known traversable starting position.</param>
     /// <param name="targetCount">The expected number of reachable cells.</param>
     /// <returns>True if every non-wall piece can be reached.</returns>
-    private bool IsConnected(LevelParts[,] grid, Vector2Int startPos, int targetCount)
+    private static bool IsConnected(LevelParts[,] grid, Vector2Int startPos, int targetCount)
     {
         int s = grid.GetLength(0);
         bool[,] visited = new bool[s, s];
-        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        Queue<Vector2Int> queue = new();
         
         queue.Enqueue(startPos);
         visited[startPos.x, startPos.y] = true;
@@ -306,7 +347,7 @@ public class Level : MonoBehaviour
                     {
                         visited[nx, ny] = true;
                         reachableCount++;
-                        queue.Enqueue(new Vector2Int(nx, ny));
+                        queue.Enqueue(new(nx, ny));
                     }
                 }
             }
@@ -344,6 +385,7 @@ public class Level : MonoBehaviour
                 switch (level[i, j])
                 {
                     case LevelParts.Floor:
+                    case LevelParts.Enemy:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         break;
                     case LevelParts.Wall:
@@ -356,10 +398,6 @@ public class Level : MonoBehaviour
                     case LevelParts.End:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         InstantiatePiece(coinPrefab, i, j, t, p, shift);
-                        break;
-                    case LevelParts.Enemy:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiateCenter(enemyPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Health:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
@@ -384,6 +422,21 @@ public class Level : MonoBehaviour
             InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, -1, t, p, shift);
             InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, i, t, p, shift);
             InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, size, t, p, shift);
+        }
+        
+        // Build the mesh.
+        surface?.BuildNavMesh();
+        
+        // Place enemies on the mesh.
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if (level[i, j] == LevelParts.Enemy)
+                {
+                    InstantiateCenter(enemyPrefab, i, j, t, p, shift);
+                }
+            }
         }
     }
     
