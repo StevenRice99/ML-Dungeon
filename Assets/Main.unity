@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Level
   size: 10
   wallPercent: 0.1
+  desiredEnemies: 3
   pieceSpacing: 1
   floorPrefabs:
   - {fileID: 919132149155446097, guid: e7bf34775fe2c5c4ba110d0fd4ad0151, type: 3}
@@ -159,7 +160,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 919132149155446097, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
   enemyPrefab: {fileID: 919132149155446097, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
   coinPrefab: {fileID: 919132149155446097, guid: cbd328403823a764ab1d27c2d5392145, type: 3}
-  healthPrefab: {fileID: 919132149155446097, guid: 258f738a955542f458062c26c76f5313, type: 3}
+  healthPrefab: {fileID: 919132149155446097, guid: 487a5e09e2d5b324184ed071cfa3b619, type: 3}
   weaponPrefab: {fileID: 919132149155446097, guid: f0bfae49c9155dc4cb72064868733024, type: 3}
 --- !u!4 &659273211
 Transform:
