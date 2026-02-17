@@ -414,7 +414,18 @@ public class Level : MonoBehaviour
     private void InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
         GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
-        // TODO - Rotate.
+        
+        // Calculate the direction from the object's current position to the center.
+        Vector3 directionToCenter = p - go.transform.position;
+        
+        // Zero out the Y axis to ensure the object stays flat on the floor.
+        directionToCenter.y = 0f;
+        
+        // Prevent "Look rotation viewing vector is zero" warnings.
+        if (directionToCenter != Vector3.zero)
+        {
+            go.transform.rotation = Quaternion.LookRotation(directionToCenter);
+        }
     }
     
     /// <summary>
