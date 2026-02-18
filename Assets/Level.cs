@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
@@ -386,26 +387,14 @@ public class Level : MonoBehaviour
                 {
                     case LevelParts.Floor:
                     case LevelParts.Enemy:
+                    case LevelParts.Start:
+                    case LevelParts.End:
+                    case LevelParts.Health:
+                    case LevelParts.Weapon:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         break;
                     case LevelParts.Wall:
                         InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, j, t, p, shift);
-                        break;
-                    case LevelParts.Start:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiateCenter(playerPrefab, i, j, t, p, shift);
-                        break;
-                    case LevelParts.End:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiatePiece(coinPrefab, i, j, t, p, shift);
-                        break;
-                    case LevelParts.Health:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiateFixed(healthPrefab, i, j, t, p, shift);
-                        break;
-                    case LevelParts.Weapon:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
-                        InstantiateFixed(weaponPrefab, i, j, t, p, shift);
                         break;
                 }
             }
@@ -425,16 +414,49 @@ public class Level : MonoBehaviour
         }
         
         // Build the mesh.
+        Physics.SyncTransforms();
         surface?.BuildNavMesh();
         
-        // Place enemies on the mesh.
+        // Place dynamic elements.
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                if (level[i, j] == LevelParts.Enemy)
+                switch (level[i, j])
                 {
-                    InstantiateCenter(enemyPrefab, i, j, t, p, shift);
+                    case LevelParts.Start:
+                        GameObject go = Instantiate(playerPrefab, t);
+                        if (go.TryGetComponent(out Rigidbody rb))
+                        {
+                            Vector3 correct = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
+                            rb.position = correct;
+                            rb.rotation = FaceCenter(correct, p);
+                        }
+                        else
+                        {
+                            Transform tr = go.transform;
+                            tr.position = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
+                            tr.rotation = FaceCenter(tr.position, p);
+                        }
+                        go.name = playerPrefab.name;
+                        _parts.Add(go);
+                        break;
+                    case LevelParts.End:
+                        InstantiatePiece(coinPrefab, i, j, t, p, shift);
+                        break;
+                    case LevelParts.Health:
+                        InstantiateFixed(healthPrefab, i, j, t, p, shift);
+                        break;
+                    case LevelParts.Weapon:
+                        InstantiateFixed(weaponPrefab, i, j, t, p, shift);
+                        break;
+                    case LevelParts.Enemy:
+                        InstantiateCenter(enemyPrefab, i, j, t, p, shift);
+                        break;
+                    case LevelParts.Floor:
+                    case LevelParts.Wall:
+                    default:
+                        break;
                 }
             }
         }
@@ -467,18 +489,25 @@ public class Level : MonoBehaviour
     private void InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
         GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
-        
+        Transform tr = go.transform;
+        tr.rotation = FaceCenter(tr.position, p);
+    }
+    
+    /// <summary>
+    /// Have an object face the center.
+    /// </summary>
+    /// <param name="current">The current position.</param>
+    /// <param name="center">The center position.</param>
+    private static Quaternion FaceCenter(Vector3 current, Vector3 center)
+    {
         // Calculate the direction from the object's current position to the center.
-        Vector3 directionToCenter = p - go.transform.position;
+        Vector3 directionToCenter = center - current;
         
         // Zero out the Y axis to ensure the object stays flat on the floor.
         directionToCenter.y = 0f;
         
         // Prevent "Look rotation viewing vector is zero" warnings.
-        if (directionToCenter != Vector3.zero)
-        {
-            go.transform.rotation = Quaternion.LookRotation(directionToCenter);
-        }
+        return directionToCenter != Vector3.zero ? Quaternion.LookRotation(directionToCenter) : Quaternion.identity;
     }
     
     /// <summary>
