@@ -5,12 +5,12 @@ using Unity.MLAgents.Policies;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 /// <summary>
 /// The player agent itself.
 /// </summary>
 [SelectionBase]
 [DisallowMultipleComponent]
+[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BehaviorParameters))]
 public class Player : Agent
@@ -39,7 +39,15 @@ public class Player : Agent
     [Tooltip("The rigidbody for controlling the movement of this agent.")]
     [HideInInspector]
     [SerializeField]
-    private Rigidbody body;
+    public Rigidbody body;
+    
+    /// <summary>
+    /// The <see cref="Collider"/> hitting objects.
+    /// </summary>
+    [Tooltip("The collider for hitting objects.")]
+    [HideInInspector]
+    [SerializeField]
+    private Collider col;
     
     /// <summary>
     /// The <see cref="BehaviorParameters"/> for the decision-making of this agent.
@@ -114,6 +122,7 @@ public class Player : Agent
     private void GetComponents()
     {
         GetRigidbody();
+        GetCollider();
         GetParameters();
     }
     
@@ -138,6 +147,22 @@ public class Player : Agent
         body.centerOfMass = Vector3.zero;
         body.maxAngularVelocity = 0;
         body.maxLinearVelocity = speed;
+    }
+    
+    /// <summary>
+    /// Get the <see cref="col"/>.
+    /// </summary>
+    private void GetCollider()
+    {
+        if (col == null || col.gameObject != gameObject)
+        {
+            col = GetComponent<Collider>();
+        }
+        
+        if (!Application.isPlaying && col)
+        {
+            col.isTrigger = true;
+        }
     }
     
     /// <summary>
@@ -250,6 +275,7 @@ public class Player : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        Debug.Log("OnEpisodeBegin");
+        Instance.CreateLevel();
+        col.isTrigger = false;
     }
 }

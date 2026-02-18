@@ -96,7 +96,7 @@ public class Level : MonoBehaviour
     private NavMeshSurface surface;
     
     /// <summary>
-    /// All spawned parts.
+    /// All spawned parts, besides walkable areas.
     /// </summary>
     private readonly List<GameObject> _parts = new();
     
@@ -149,7 +149,28 @@ public class Level : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        if (Agent == null)
+        {
+            Transform t = transform;
+            if (Instantiate(playerPrefab, t.position, Quaternion.identity, t).TryGetComponent(out Player player))
+            {
+                Agent = player;
+                Agent.Instance = this;
+            }
+        }
+        else
+        {
+            Agent.Instance = this;
+        }
+        
         GetNavMeshSurface();
+    }
+    
+    /// <summary>
+    /// Create the level.
+    /// </summary>
+    public void CreateLevel()
+    {
         PlaceLevel(GenerateLevel());
     }
     
@@ -358,11 +379,24 @@ public class Level : MonoBehaviour
                 Destroy(part);
             }
         }
+        foreach (GameObject part in _walkable)
+        {
+            if (part)
+            {
+                Destroy(part);
+            }
+        }
+        foreach (GameObject part in _walkable)
+        {
+            if (part)
+            {
+                Destroy(part);
+            }
+        }
         
         // Reset the cache.
         _parts.Clear();
         _walkable.Clear();
-        Agent = null;
         Enemies.Clear();
         
         // Place the generated level.
@@ -380,26 +414,26 @@ public class Level : MonoBehaviour
                     case LevelParts.Start:
                     case LevelParts.End:
                     case LevelParts.Weapon:
-                        _walkable.Add(InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift));
+                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift, _walkable);
                         break;
                     case LevelParts.Wall:
-                        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, j, t, p, shift);
+                        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, j, t, p, shift, _parts);
                         break;
                 }
             }
         }
         
         // Place outer walls.
-        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, -1, t, p, shift);
-        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, size, t, p, shift);
-        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, -1, t, p, shift);
-        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, size, t, p, shift);
+        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, -1, t, p, shift, _parts);
+        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, size, t, p, shift, _parts);
+        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, -1, t, p, shift, _parts);
+        InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, size, t, p, shift, _parts);
         for (int i = 0; i < size; i++)
         {
-            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, i, t, p, shift);
-            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, -1, t, p, shift);
-            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, i, t, p, shift);
-            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, size, t, p, shift);
+            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], -1, i, t, p, shift, _parts);
+            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, -1, t, p, shift, _parts);
+            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], size, i, t, p, shift, _parts);
+            InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, size, t, p, shift, _parts);
         }
         
         // Build the mesh.
@@ -414,20 +448,30 @@ public class Level : MonoBehaviour
                 switch (level[i, j])
                 {
                     case LevelParts.Start:
-                        if (InstantiateCenter(playerPrefab, i, j, t, p, shift).TryGetComponent(out Player player))
+                        if (Agent == null)
                         {
-                            player.Instance = this;
-                            Agent = player;
+                            if (InstantiateCenter(playerPrefab, i, j, t, p, shift).TryGetComponent(out Player player))
+                            {
+                                player.Instance = this;
+                                Agent = player;
+                            }
+                        }
+                        else
+                        {
+                            Vector3 current = IndexToPosition(i, j, p, shift);
+                            Agent.body.position = current;
+                            Agent.body.rotation = FaceCenter(current, p);
+                            Agent.Instance = this;
                         }
                         break;
                     case LevelParts.End:
-                        InstantiatePiece(coinPrefab, i, j, t, p, shift);
+                        InstantiatePiece(coinPrefab, i, j, t, p, shift, _parts);
                         break;
                     case LevelParts.Weapon:
-                        InstantiateFixed(weaponPrefab, i, j, t, p, shift);
+                        InstantiateFixed(weaponPrefab, i, j, t, p, shift, _parts);
                         break;
                     case LevelParts.Enemy:
-                        if (InstantiateCenter(enemyPrefab, i, j, t, p, shift).TryGetComponent(out Enemy enemy))
+                        if (InstantiateCenter(enemyPrefab, i, j, t, p, shift, _parts).TryGetComponent(out Enemy enemy))
                         {
                             enemy.Instance = this;
                             Enemies.Add(enemy);
@@ -451,10 +495,11 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
+    /// <param name="cache">The cache to add this to.</param>
     /// <returns>The spawned instance.</returns>
-    private GameObject InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    private GameObject InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null)
     {
-        return InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t);
+        return InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t, cache);
     }
     
     /// <summary>
@@ -466,11 +511,12 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
+    /// <param name="cache">The cache to add this to.</param>
     /// <returns>The spawned instance.</returns>
-    private GameObject InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    private GameObject InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null)
     {
         Vector3 position = IndexToPosition(i, j, p, shift);
-        GameObject go = InstantiatePiece(prefab, position, FaceCenter(position, p), t);
+        GameObject go = InstantiatePiece(prefab, position, FaceCenter(position, p), t, cache);
         return go;
     }
     
@@ -483,10 +529,11 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
+    /// <param name="cache">The cache to add this to.</param>
     /// <returns>The spawned instance.</returns>
-    private void InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    private void InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null)
     {
-        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.identity, t);
+        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.identity, t, cache);
     }
     
     /// <summary>
@@ -496,12 +543,13 @@ public class Level : MonoBehaviour
     /// <param name="p">The position to spawn it at.</param>
     /// <param name="r">The rotation to spawn it at.</param>
     /// <param name="t">The transform of this.</param>
+    /// <param name="cache">The cache to add this to.</param>
     /// <returns>The spawned instance.</returns>
-    private GameObject InstantiatePiece(GameObject prefab, Vector3 p, Quaternion r, Transform t)
+    private static GameObject InstantiatePiece(GameObject prefab, Vector3 p, Quaternion r, Transform t, List<GameObject> cache = null)
     {
         GameObject go = Instantiate(prefab, p, r, t);
         go.name = prefab.name;
-        _parts.Add(go);
+        cache?.Add(go);
         return go;
     }
     
@@ -574,6 +622,6 @@ public class Level : MonoBehaviour
         /// <summary>
         /// Where the weapon pickup is placed.
         /// </summary>
-        Weapon = 6
+        Weapon = 5
     }
 }
