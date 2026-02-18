@@ -128,7 +128,13 @@ namespace DefaultNamespace
         {
             RequestDecision();
             Vector2 current = _movement.normalized * speed;
-            body.linearVelocity = new(current.x, 0, current.y);
+            Vector3 velocity = new(current.x, 0, current.y);
+            body.linearVelocity = velocity;
+            
+            if (current != Vector2.zero)
+            {
+                body.rotation = Quaternion.LookRotation(velocity);
+            }
         }
         
         /// <summary>
