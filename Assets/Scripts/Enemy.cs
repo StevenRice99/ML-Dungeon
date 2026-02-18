@@ -20,6 +20,20 @@ public class Enemy : MonoBehaviour
     private float range = 5f;
     
     /// <summary>
+    /// The <see cref="LayerMask"/> to use for checking line-of-sight.
+    /// </summary>
+    [Tooltip("The mask to use for checking line-of-sight.")]
+    [SerializeField]
+    private LayerMask mask;
+    
+    /// <summary>
+    /// The vertical offset to use for checking line-of-sight.
+    /// </summary>
+    [Tooltip("The vertical offset to use for checking line-of-sight.")]
+    [SerializeField]
+    private float offset = 0.5f;
+    
+    /// <summary>
     /// The <see cref="NavMeshAgent"/> for controlling the movement of this enemy.
     /// </summary>
     [Tooltip("The NavMeshAgent for controlling the movement of this enemy.")]
@@ -98,13 +112,14 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
-        // If in range of the player, navigation to them.
         Vector3 p = transform.position;
-        Vector3 t = Instance.Agent.transform.position;
+        Transform target = Instance.Agent.transform;
+        Vector3 t = target.position;
         Vector2 p2 = new(p.x, p.z);
         Vector2 t2 = new(t.x, t.z);
         
-        if (Vector2.Distance(p2, t2) <= range)
+        // If in range of the player and have line-of-sight, navigation to them.
+        if (Vector2.Distance(p2, t2) <= range && (!Physics.Linecast(new(p.x, p.y + offset, p.z), new(t.x, t.y + offset, t.z), out RaycastHit hit, mask) || hit.transform == target))
         {
             agent.destination = t;
             return;

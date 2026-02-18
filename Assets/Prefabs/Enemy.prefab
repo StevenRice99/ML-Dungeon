@@ -48,9 +48,49 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7670638196022979519, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -7134394785105016132, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -5151492872390713093, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -5069531478518834764, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3250163066507786643, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4361710834771507933, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5788240856288092216, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8303906797054990637, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8908311948669537042, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -129,5 +169,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   range: 5
+  mask:
+    serializedVersion: 2
+    m_Bits: 1
+  offset: 0
   agent: {fileID: 1748127515952982965}
   col: {fileID: 3098007171682891694}

@@ -160,15 +160,10 @@ public class Player : Agent
     /// </summary>
     private void Update()
     {
-        // TODO - Rotate towards the movement direction based on the "rotation" parameter.
+        // Gradually rotate from the current rotation to the target rotation.
         if (_velocity != Vector2.zero)
         {
-            // Determine the rotation we want to face
-            Quaternion targetRotation = Quaternion.LookRotation(_velocity3);
-            
-            // Gradually rotate from the current rotation to the target rotation
-            // rotation * Time.deltaTime ensures it rotates at the specified degrees-per-second
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotation * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(_velocity3), rotation * Time.deltaTime);
         }
     }
     

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 507470215006261527}
   - component: {fileID: 4877576502625136466}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -105,6 +105,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e7bf34775fe2c5c4ba110d0fd4ad0151, type: 3}
       propertyPath: m_Name
       value: Floor
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e7bf34775fe2c5c4ba110d0fd4ad0151, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
