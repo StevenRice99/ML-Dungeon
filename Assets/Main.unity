@@ -24,9 +24,9 @@ RenderSettings:
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e438847a1e4fc408faa2bb442e7e03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level
-  size: 3
+  size: 10
   wallPercent: 0.1
   desiredEnemies: 3
   pieceSpacing: 1
@@ -161,7 +161,6 @@ MonoBehaviour:
   playerPrefab: {fileID: 3020385601691468091, guid: 5ef37596a1631474baba3a67e6ad9d1b, type: 3}
   enemyPrefab: {fileID: 32065200315984136, guid: 353514b755a9a4646aff6e1e8e07dace, type: 3}
   coinPrefab: {fileID: 709328490669782622, guid: 586d1922a3a5a9a4c80ceab6913bd5d8, type: 3}
-  healthPrefab: {fileID: 5150058218350891695, guid: 1c1c8d08a644e7443a4325ac0bc1de54, type: 3}
   weaponPrefab: {fileID: 4320876073477296290, guid: 6cb0ef883270b854ba4219d0103d0d7e, type: 3}
   surface: {fileID: 659273212}
 --- !u!4 &659273211
@@ -344,7 +343,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.2784314, g: 0.2784314, b: 0.2784314, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

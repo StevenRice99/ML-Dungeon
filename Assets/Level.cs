@@ -81,13 +81,6 @@ public class Level : MonoBehaviour
     private GameObject coinPrefab;
     
     /// <summary>
-    /// The prefab for the health pickup. These spaces are traversable.
-    /// </summary>
-    [Tooltip("The prefab for the health pickup. These spaces are traversable.")]
-    [SerializeField]
-    private GameObject healthPrefab;
-    
-    /// <summary>
     /// The prefab for the weapon pickup. These spaces are traversable.
     /// </summary>
     [Tooltip("The prefab for the weapon pickup. These spaces are traversable.")]
