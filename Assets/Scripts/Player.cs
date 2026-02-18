@@ -18,6 +18,7 @@ public class Player : Agent
     /// <summary>
     /// How fast this agent can move.
     /// </summary>
+    [Header("Configuration")]
     [Tooltip("How fast this agent can move.")]
     [Min(float.Epsilon)]
     [SerializeField]
@@ -34,6 +35,7 @@ public class Player : Agent
     /// <summary>
     /// The <see cref="Rigidbody"/> for controlling the movement of this agent.
     /// </summary>
+    [Header("Components")]
     [Tooltip("The rigidbody for controlling the movement of this agent.")]
     [HideInInspector]
     [SerializeField]
@@ -46,6 +48,28 @@ public class Player : Agent
     [HideInInspector]
     [SerializeField]
     private BehaviorParameters parameters;
+    
+    /// <summary>
+    /// The reward for winning the level.
+    /// </summary>
+    [Header("Rewards")]
+    [Tooltip("The reward for winning the level.")]
+    [SerializeField]
+    private float win = 1f;
+    
+    /// <summary>
+    /// The reward for eliminating an enemy.
+    /// </summary>
+    [Tooltip("The reward for eliminating an enemy.")]
+    [SerializeField]
+    private float eliminate = 1f;
+    
+    /// <summary>
+    /// The penalty given every tick.
+    /// </summary>
+    [Tooltip("The penalty given every tick.")]
+    [SerializeField]
+    private float penalty = -0.01f;
     
     /// <summary>
     /// The <see cref="Level"/> this is a part of.
@@ -168,6 +192,40 @@ public class Player : Agent
     }
     
     /// <summary>
+    /// When a GameObject collides with another GameObject, Unity calls OnTriggerEnter. This function can be a coroutine.
+    /// </summary>
+    /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
+    private void OnTriggerEnter(Collider other)
+    {
+        // The weapon pickup uses the "Respawn" tag.
+        if (other.CompareTag("Respawn"))
+        {
+            // TODO - Pick up weapon.
+            return;
+        }
+        
+        // The end-level coin uses the "Finish" tag. There must be no enemies left to finish the level.
+        if (Instance.Enemies.Count < 1 && other.CompareTag("Finish"))
+        {
+            AddReward(win);
+            EndEpisode();
+            return;
+        }
+        
+        // The only other targets for us are enemies.
+        if (!other.TryGetComponent(out Enemy enemy))
+        {
+            return;
+        }
+        
+        // If we have the weapon, eliminate the enemy.
+        // TODO - Handle if we have the weapon.
+        
+        // Otherwise, end the episode.
+        EndEpisode();
+    }
+    
+    /// <summary>
     /// Read actions to control the player.
     /// </summary>
     /// <param name="actions"></param>
@@ -185,5 +243,13 @@ public class Player : Agent
     {
         actionsOut.ContinuousActions.Array[0] = Keyboard.current.dKey.isPressed ? Keyboard.current.aKey.isPressed ? 0f : 1f : Keyboard.current.aKey.isPressed ? -1f : 0f;
         actionsOut.ContinuousActions.Array[1] = Keyboard.current.wKey.isPressed ? Keyboard.current.sKey.isPressed ? 0f : 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
+    }
+    
+    /// <summary>
+    /// Called to reset the world.
+    /// </summary>
+    public override void OnEpisodeBegin()
+    {
+        Debug.Log("OnEpisodeBegin");
     }
 }
