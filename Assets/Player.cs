@@ -46,6 +46,16 @@ namespace DefaultNamespace
         private Vector2 _movement = Vector2.zero;
         
         /// <summary>
+        /// The current velocity.
+        /// </summary>
+        private Vector2 _velocity;
+        
+        /// <summary>
+        /// The current velocity.
+        /// </summary>
+        private Vector3 _velocity3;
+        
+        /// <summary>
         /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
         /// </summary>
         private void OnValidate()
@@ -127,13 +137,19 @@ namespace DefaultNamespace
         private void FixedUpdate()
         {
             RequestDecision();
-            Vector2 current = _movement.normalized * speed;
-            Vector3 velocity = new(current.x, 0, current.y);
-            body.linearVelocity = velocity;
-            
-            if (current != Vector2.zero)
+            _velocity = _movement.normalized * speed;
+            _velocity3 = new(_velocity.x, 0, _velocity.y);
+            body.linearVelocity = _velocity3;
+        }
+        
+        /// <summary>
+        /// Update is called every frame, if the MonoBehaviour is enabled.
+        /// </summary>
+        private void Update()
+        {
+            if (_velocity != Vector2.zero)
             {
-                body.rotation = Quaternion.LookRotation(velocity);
+                transform.rotation = Quaternion.LookRotation(_velocity3);
             }
         }
         
