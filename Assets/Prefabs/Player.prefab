@@ -66,6 +66,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4882874150285239862}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3681100737196805247}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -407068295899356925}
   m_SourcePrefab: {fileID: 100100000, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
 --- !u!1 &3020385601691468091 stripped
 GameObject:
@@ -120,5 +126,55 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 84
+  m_Constraints: 116
   m_CollisionDetection: 2
+--- !u!114 &-3681100737196805247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3020385601691468091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
+  m_BrainParameters:
+    VectorObservationSize: 0
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 2
+      BranchSizes: 
+    VectorActionSize: 02000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 1
+  m_BehaviorName: DungeonPlayer
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_DeterministicInference: 0
+  m_ObservableAttributeHandling: 0
+--- !u!114 &-407068295899356925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3020385601691468091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08dd8470eebb4fe792caa67ac9a83f10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefaultNamespace.Player
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  speed: 3
+  body: {fileID: 4882874150285239862}
+  parameters: {fileID: -3681100737196805247}
