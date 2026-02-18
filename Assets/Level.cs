@@ -425,21 +425,7 @@ public class Level : MonoBehaviour
                 switch (level[i, j])
                 {
                     case LevelParts.Start:
-                        GameObject go = Instantiate(playerPrefab, t);
-                        if (go.TryGetComponent(out Rigidbody rb))
-                        {
-                            Vector3 correct = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
-                            rb.position = correct;
-                            rb.rotation = FaceCenter(correct, p);
-                        }
-                        else
-                        {
-                            Transform tr = go.transform;
-                            tr.position = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
-                            tr.rotation = FaceCenter(tr.position, p);
-                        }
-                        go.name = playerPrefab.name;
-                        _parts.Add(go);
+                        InstantiateCenter(playerPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.End:
                         InstantiatePiece(coinPrefab, i, j, t, p, shift);
@@ -473,8 +459,7 @@ public class Level : MonoBehaviour
     /// <param name="shift">How much to shift each piece for centering.</param>
     private void InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
-        GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
-        go.transform.localEulerAngles = new(0, 90f * Random.Range(0, 4), 0);
+        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t);
     }
     
     /// <summary>
@@ -486,11 +471,56 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
-    private void InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    /// <returns>The spawned instance.</returns>
+    private GameObject InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
-        GameObject go = InstantiatePiece(prefab, i, j, t, p, shift);
-        Transform tr = go.transform;
-        tr.rotation = FaceCenter(tr.position, p);
+        Vector3 position = IndexToPosition(i, j, p, shift);
+        GameObject go = InstantiatePiece(prefab, position, FaceCenter(position, p), t);
+        return go;
+    }
+    
+    /// <summary>
+    /// Instantiate a piece at a given grid offset.
+    /// </summary>
+    /// <param name="prefab">The prefab to spawn.</param>
+    /// <param name="i">The first index.</param>
+    /// <param name="j">The second index.</param>
+    /// <param name="t">The transform of this.</param>
+    /// <param name="p">The position of this.</param>
+    /// <param name="shift">How much to shift each piece for centering.</param>
+    /// <returns>The spawned instance.</returns>
+    private void InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    {
+        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.identity, t);
+    }
+    
+    /// <summary>
+    /// Instantiate a piece.
+    /// </summary>
+    /// <param name="prefab">The prefab to spawn.</param>
+    /// <param name="p">The position to spawn it at.</param>
+    /// <param name="r">The rotation to spawn it at.</param>
+    /// <param name="t">The transform of this.</param>
+    /// <returns>The spawned instance.</returns>
+    private GameObject InstantiatePiece(GameObject prefab, Vector3 p, Quaternion r, Transform t)
+    {
+        GameObject go = Instantiate(prefab, p, r, t);
+        go.name = prefab.name;
+        _parts.Add(go);
+        return go;
+    }
+    
+    /// <summary>
+    /// Convert an index to a position.
+    /// </summary>
+    /// <param name="i">The first index.</param>
+    /// <param name="j">The second index.</param>
+    /// <param name="p">The position of this.</param>
+    /// <param name="shift">How much to shift each piece for centering.</param>
+    /// <returns>The position to place this at.</returns>
+    private Vector3 IndexToPosition(int i, int j, Vector3 p, float shift)
+    {
+        return new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
     }
     
     /// <summary>
@@ -508,25 +538,6 @@ public class Level : MonoBehaviour
         
         // Prevent "Look rotation viewing vector is zero" warnings.
         return directionToCenter != Vector3.zero ? Quaternion.LookRotation(directionToCenter) : Quaternion.identity;
-    }
-    
-    /// <summary>
-    /// Instantiate a piece.
-    /// </summary>
-    /// <param name="prefab">The prefab to spawn.</param>
-    /// <param name="i">The first index.</param>
-    /// <param name="j">The second index.</param>
-    /// <param name="t">The transform of this.</param>
-    /// <param name="p">The position of this.</param>
-    /// <param name="shift">How much to shift each piece for centering.</param>
-    /// <returns>The spawned instance.</returns>
-    private GameObject InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
-    {
-        GameObject go = Instantiate(prefab, t);
-        go.transform.position = new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
-        go.name = prefab.name;
-        _parts.Add(go);
-        return go;
     }
     
     /// <summary>
