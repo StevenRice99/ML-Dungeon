@@ -149,7 +149,7 @@ public class Level : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        if (Agent == null)
+        if (!Agent)
         {
             Transform t = transform;
             if (Instantiate(playerPrefab, t.position, Quaternion.identity, t).TryGetComponent(out Player player))
@@ -496,10 +496,9 @@ public class Level : MonoBehaviour
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
     /// <param name="cache">The cache to add this to.</param>
-    /// <returns>The spawned instance.</returns>
-    private GameObject InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null)
+    private void InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null)
     {
-        return InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t, cache);
+        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t, cache);
     }
     
     /// <summary>

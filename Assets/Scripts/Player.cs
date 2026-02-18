@@ -33,9 +33,16 @@ public class Player : Agent
     private float rotation = 360f;
     
     /// <summary>
-    /// The <see cref="Rigidbody"/> for controlling the movement of this agent.
+    /// The weapon visual.
     /// </summary>
     [Header("Components")]
+    [Tooltip("The weapon visual.")]
+    [SerializeField]
+    private GameObject weapon;
+    
+    /// <summary>
+    /// The <see cref="Rigidbody"/> for controlling the movement of this agent.
+    /// </summary>
     [Tooltip("The rigidbody for controlling the movement of this agent.")]
     [HideInInspector]
     [SerializeField]
@@ -80,6 +87,13 @@ public class Player : Agent
     private float penalty = -0.01f;
     
     /// <summary>
+    /// The penalty to lose when we try to fight an enemy without the weapon.
+    /// </summary>
+    [Tooltip("The penalty to lose when we try to fight an enemy without the weapon.")]
+    [SerializeField]
+    private float lose = -1;
+    
+    /// <summary>
     /// The <see cref="Level"/> this is a part of.
     /// </summary>
     [NonSerialized]
@@ -99,6 +113,11 @@ public class Player : Agent
     /// The current velocity.
     /// </summary>
     private Vector3 _velocity3;
+    
+    /// <summary>
+    /// If we currently have the weapon.
+    /// </summary>
+    private bool _hasWeapon;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -202,6 +221,9 @@ public class Player : Agent
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
         body.linearVelocity = _velocity3;
+        
+        // Always tick down penalties to learn to complete levels quickly.
+        AddReward(penalty);
     }
     
     /// <summary>
@@ -222,10 +244,29 @@ public class Player : Agent
     /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
     private void OnTriggerEnter(Collider other)
     {
+        HandleTriggers(other);
+    }
+    
+    /// <summary>
+    /// OnTriggerStay is called once per physics update for every Collider other that is touching the trigger. This function can be a coroutine.
+    /// </summary>
+    /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
+    private void OnTriggerStay(Collider other)
+    {
+        HandleTriggers(other);
+    }
+    
+    /// <summary>
+    /// Handle active triggers.
+    /// </summary>
+    /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
+    private void HandleTriggers(Collider other)
+    {
         // The weapon pickup uses the "Respawn" tag.
         if (other.CompareTag("Respawn"))
         {
-            // TODO - Pick up weapon.
+            _hasWeapon = true;
+            weapon?.SetActive(true);
             return;
         }
         
@@ -243,13 +284,20 @@ public class Player : Agent
             return;
         }
         
-        // If we have the weapon, eliminate the enemy.
-        // TODO - Handle if we have the weapon.
+        // If we have the weapon, eliminate enemies.
+        if (_hasWeapon)
+        {
+            Instance?.Enemies.Remove(enemy);
+            Destroy(enemy.gameObject);
+            AddReward(eliminate);
+            return;
+        }
         
-        // Otherwise, end the episode.
+        // Otherwise, give the losing penalty and end the episode.
+        AddReward(lose);
         EndEpisode();
     }
-    
+
     /// <summary>
     /// Read actions to control the player.
     /// </summary>
@@ -275,7 +323,15 @@ public class Player : Agent
     /// </summary>
     public override void OnEpisodeBegin()
     {
-        Instance.CreateLevel();
+        // To start, ensure the collider is a trigger to not cause any detections as the level is being generated.
+        col.isTrigger = true;
+        _hasWeapon = false;
+        weapon?.SetActive(false);
+        
+        // Create the level.
+        Instance?.CreateLevel();
+        
+        // Now that the player is spawned, set back to a regular collider.
         col.isTrigger = false;
     }
 }
