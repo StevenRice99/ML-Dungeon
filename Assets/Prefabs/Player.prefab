@@ -176,5 +176,6 @@ MonoBehaviour:
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
   speed: 3
+  rotation: 360
   body: {fileID: 4882874150285239862}
   parameters: {fileID: -3681100737196805247}

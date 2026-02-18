@@ -101,6 +101,21 @@ public class Level : MonoBehaviour
     private readonly List<GameObject> _parts = new();
     
     /// <summary>
+    /// Walkable positions.
+    /// </summary>
+    private readonly List<GameObject> _walkable = new();
+    
+    /// <summary>
+    /// The <see cref="Player"/>.
+    /// </summary>
+    public Player Agent { get; private set; }
+    
+    /// <summary>
+    /// The enemies.
+    /// </summary>
+    public readonly List<Enemy> Enemies = new();
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -346,6 +361,9 @@ public class Level : MonoBehaviour
         
         // Reset the cache.
         _parts.Clear();
+        _walkable.Clear();
+        Agent = null;
+        Enemies.Clear();
         
         // Place the generated level.
         Transform t = transform;
@@ -362,7 +380,7 @@ public class Level : MonoBehaviour
                     case LevelParts.Start:
                     case LevelParts.End:
                     case LevelParts.Weapon:
-                        InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
+                        _walkable.Add(InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift));
                         break;
                     case LevelParts.Wall:
                         InstantiatePiece(wallPrefabs[Random.Range(0, wallPrefabs.Length)], i, j, t, p, shift);
@@ -396,7 +414,11 @@ public class Level : MonoBehaviour
                 switch (level[i, j])
                 {
                     case LevelParts.Start:
-                        InstantiateCenter(playerPrefab, i, j, t, p, shift);
+                        if (InstantiateCenter(playerPrefab, i, j, t, p, shift).TryGetComponent(out Player player))
+                        {
+                            player.Instance = this;
+                            Agent = player;
+                        }
                         break;
                     case LevelParts.End:
                         InstantiatePiece(coinPrefab, i, j, t, p, shift);
@@ -405,7 +427,11 @@ public class Level : MonoBehaviour
                         InstantiateFixed(weaponPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Enemy:
-                        InstantiateCenter(enemyPrefab, i, j, t, p, shift);
+                        if (InstantiateCenter(enemyPrefab, i, j, t, p, shift).TryGetComponent(out Enemy enemy))
+                        {
+                            enemy.Instance = this;
+                            Enemies.Add(enemy);
+                        }
                         break;
                     case LevelParts.Floor:
                     case LevelParts.Wall:
@@ -425,9 +451,10 @@ public class Level : MonoBehaviour
     /// <param name="t">The transform of this.</param>
     /// <param name="p">The position of this.</param>
     /// <param name="shift">How much to shift each piece for centering.</param>
-    private void InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
+    /// <returns>The spawned instance.</returns>
+    private GameObject InstantiateFixed(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift)
     {
-        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t);
+        return InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)), t);
     }
     
     /// <summary>
@@ -507,6 +534,12 @@ public class Level : MonoBehaviour
         // Prevent "Look rotation viewing vector is zero" warnings.
         return directionToCenter != Vector3.zero ? Quaternion.LookRotation(directionToCenter) : Quaternion.identity;
     }
+    
+    /// <summary>
+    /// Get a random walkable point.
+    /// </summary>
+    /// <returns>A random walkable point.</returns>
+    public Vector3 RandomWalkable() => _walkable[Random.Range(0, _walkable.Count)].transform.position;
     
     /// <summary>
     /// The flags for each part of the level.
