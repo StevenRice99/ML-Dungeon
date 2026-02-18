@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
@@ -154,7 +153,7 @@ public class Level : MonoBehaviour
     {
         LevelParts[,] level = new LevelParts[size, size];
         
-        // Initialize all spaces as floors
+        // Initialize all spaces as floors.
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -163,7 +162,7 @@ public class Level : MonoBehaviour
             }
         }
         
-        // 1. Place Start and End in distinct corners
+        // Place the start and end in distinct corners.
         Vector2Int[] corners = {
             new(0, 0),
             new(0, size - 1),
@@ -184,42 +183,45 @@ public class Level : MonoBehaviour
         level[startPos.x, startPos.y] = LevelParts.Start;
         level[endPos.x, endPos.y] = LevelParts.End;
         
-        // 4. Place Walls ensuring full connectivity
+        // Place walls ensuring full connectivity.
         int totalCells = size * size;
-        int targetWalls = Mathf.FloorToInt(totalCells * wallPercent);
-        int wallsPlaced = 0;
-        int maxWallAttempts = targetWalls * 10; // Prevent infinite loops
-        int attempts = 0;
-        int currentTraversable = totalCells;
-        
-        while (wallsPlaced < targetWalls && attempts < maxWallAttempts)
+        int maxWalls = totalCells - 2 - desiredEnemies;
+        if (maxWalls > 0)
         {
-            attempts++;
-            int rx = Random.Range(0, size);
-            int ry = Random.Range(0, size);
+            int targetWalls = Mathf.Min(Mathf.FloorToInt(totalCells * wallPercent), maxWalls);
+            int wallsPlaced = 0;
+            int maxWallAttempts = targetWalls * 10;
+            int attempts = 0;
+            int currentTraversable = totalCells;
             
-            // Only place walls on empty floors
-            if (level[rx, ry] == LevelParts.Floor)
+            while (wallsPlaced < targetWalls && attempts < maxWallAttempts)
             {
-                level[rx, ry] = LevelParts.Wall;
-                currentTraversable--;
+                attempts++;
+                int rx = Random.Range(0, size);
+                int ry = Random.Range(0, size);
                 
-                // If the level is still fully connected, keep the wall
-                if (IsConnected(level, startPos, currentTraversable))
+                // Only place walls on empty floors.
+                if (level[rx, ry] == LevelParts.Floor)
                 {
-                    wallsPlaced++;
-                }
-                else
-                {
-                    // Revert the wall if it breaks the path
-                    level[rx, ry] = LevelParts.Floor;
-                    currentTraversable++;
+                    level[rx, ry] = LevelParts.Wall;
+                    currentTraversable--;
+                
+                    // If the level is still fully connected, keep the wall.
+                    if (IsConnected(level, startPos, currentTraversable))
+                    {
+                        wallsPlaced++;
+                    }
+                    else
+                    {
+                        // Revert the wall if it breaks the path.
+                        level[rx, ry] = LevelParts.Floor;
+                        currentTraversable++;
+                    }
                 }
             }
         }
         
-        // 3. Place Enemies as far away from the player as possible
-        // Calculate the true walking distance from the start position using BFS
+        // Place Enemies as far away from the player as possible from true walking distance from the start position using BFS.
         int[,] distances = new int[size, size];
         for (int i = 0; i < size; i++)
         {
@@ -268,48 +270,25 @@ public class Level : MonoBehaviour
             }
         }
         
-        // Sort floors by distance descending (furthest first)
+        // Sort floors by distance, with the furthest first.
         floorDistances.Sort((a, b) => b.Value.CompareTo(a.Value));
-        
-        int enemiesPlaced = 0;
-        for (int i = 0; i < desiredEnemies && i < floorDistances.Count; i++)
+
+        int maxEnemies = Mathf.Min(desiredEnemies, floorDistances.Count - 1);
+        for (int i = 0; i < maxEnemies && i < floorDistances.Count; i++)
         {
             Vector2Int pos = floorDistances[i].Key;
             level[pos.x, pos.y] = LevelParts.Enemy;
-            enemiesPlaced++;
         }
         
-        // 2. Place Weapon and Health if any enemies were placed
-        if (enemiesPlaced > 0)
+        // Place the weapon pickup.
+        List<Vector2Int> remainingFloors = new();
+        for (int i = maxEnemies; i < floorDistances.Count; i++)
         {
-            List<Vector2Int> remainingFloors = new();
-            for (int i = enemiesPlaced; i < floorDistances.Count; i++)
-            {
-                remainingFloors.Add(floorDistances[i].Key);
-            }
-            
-            // Shuffle the remaining floors for random item placement
-            for (int i = 0; i < remainingFloors.Count; i++)
-            {
-                int swap = Random.Range(i, remainingFloors.Count);
-                (remainingFloors[i], remainingFloors[swap]) = (remainingFloors[swap], remainingFloors[i]);
-            }
-            
-            if (remainingFloors.Count > 0)
-            {
-                Vector2Int pos = remainingFloors[0];
-                level[pos.x, pos.y] = LevelParts.Weapon;
-                remainingFloors.RemoveAt(0);
-            }
-            
-            if (remainingFloors.Count > 0)
-            {
-                Vector2Int pos = remainingFloors[0];
-                level[pos.x, pos.y] = LevelParts.Health;
-                remainingFloors.RemoveAt(0);
-            }
+            remainingFloors.Add(floorDistances[i].Key);
         }
         
+        Vector2Int weapon = remainingFloors[Random.Range(0, remainingFloors.Count)];
+        level[weapon.x, weapon.y] = LevelParts.Weapon;
         return level;
     }
     
@@ -389,7 +368,6 @@ public class Level : MonoBehaviour
                     case LevelParts.Enemy:
                     case LevelParts.Start:
                     case LevelParts.End:
-                    case LevelParts.Health:
                     case LevelParts.Weapon:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift);
                         break;
@@ -429,9 +407,6 @@ public class Level : MonoBehaviour
                         break;
                     case LevelParts.End:
                         InstantiatePiece(coinPrefab, i, j, t, p, shift);
-                        break;
-                    case LevelParts.Health:
-                        InstantiateFixed(healthPrefab, i, j, t, p, shift);
                         break;
                     case LevelParts.Weapon:
                         InstantiateFixed(weaponPrefab, i, j, t, p, shift);
@@ -569,11 +544,6 @@ public class Level : MonoBehaviour
         /// Where enemies are placed.
         /// </summary>
         Enemy = 4,
-        
-        /// <summary>
-        /// Where health pickups are placed.
-        /// </summary>
-        Health = 5,
         
         /// <summary>
         /// Where the weapon pickup is placed.

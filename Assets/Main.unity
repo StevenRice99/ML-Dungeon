@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65e438847a1e4fc408faa2bb442e7e03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level
-  size: 10
+  size: 3
   wallPercent: 0.1
   desiredEnemies: 3
   pieceSpacing: 1
@@ -210,7 +210,7 @@ MonoBehaviour:
   m_VoxelSize: 0.083333336
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
-  m_BuildHeightMesh: 0
+  m_BuildHeightMesh: 1
 --- !u!1 &1667030701
 GameObject:
   m_ObjectHideFlags: 0
