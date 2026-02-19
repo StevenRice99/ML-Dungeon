@@ -148,13 +148,13 @@ public class Level : MonoBehaviour
     private readonly List<GameObject> _wallsExcess = new();
     
     /// <summary>
-    /// All weapon pickup.
+    /// The weapon pickup.
     /// </summary>
     [NonSerialized]
     public GameObject Weapon;
     
     /// <summary>
-    /// All end-of-level coin.
+    /// The end-of-level coin.
     /// </summary>
     [NonSerialized]
     public GameObject End;

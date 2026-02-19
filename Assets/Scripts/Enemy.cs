@@ -44,10 +44,10 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// The <see cref="NavMeshAgent"/> for controlling the movement of this enemy.
     /// </summary>
-    [Tooltip("The NavMeshAgent for controlling the movement of this enemy.")]
-    [HideInInspector]
-    [SerializeField]
-    private NavMeshAgent agent;
+    [field: Tooltip("The NavMeshAgent for controlling the movement of this enemy.")]
+    [field: HideInInspector]
+    [field: SerializeField]
+    public NavMeshAgent Agent { get; private set; }
     
     /// <summary>
     /// The <see cref="Collider"/> hitting the <see cref="Level.Agent"/>.
@@ -106,13 +106,13 @@ public class Enemy : MonoBehaviour
     }
     
     /// <summary>
-    /// Get the <see cref="agent"/>.
+    /// Get the <see cref="Agent"/>.
     /// </summary>
     private void GetNavMeshAgent()
     {
-        if (agent == null || agent.gameObject != gameObject)
+        if (Agent == null || Agent.gameObject != gameObject)
         {
-            agent = GetComponent<NavMeshAgent>();
+            Agent = GetComponent<NavMeshAgent>();
         }
     }
     
@@ -162,14 +162,14 @@ public class Enemy : MonoBehaviour
         // If in range of the player and have line-of-sight, navigation to them.
         if (Vector2.Distance(p2, t2) <= range && (!Physics.Linecast(new(p.x, p.y + offset, p.z), new(t.x, t.y + offset, t.z), out RaycastHit hit, mask) || hit.transform == target))
         {
-            agent.destination = t;
+            Agent.destination = t;
             return;
         }
         
         // Otherwise, if we don't have a path, choose a random position.
-        if (!agent.hasPath)
+        if (!Agent.hasPath)
         {
-            agent.destination = Instance.RandomWalkable();
+            Agent.destination = Instance.RandomWalkable();
         }
     }
     
@@ -178,6 +178,6 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        animator.SetFloat(Speed, new Vector2(agent.velocity.x, agent.velocity.z).magnitude / agent.speed);
+        animator.SetFloat(Speed, new Vector2(Agent.velocity.x, Agent.velocity.z).magnitude / Agent.speed);
     }
 }

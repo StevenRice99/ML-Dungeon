@@ -50,9 +50,18 @@ public class Player : Agent
     /// <summary>
     /// If the <see cref="Heuristic"/> control should use manual keyboard movement.
     /// </summary>
+    [Header("Heuristic")]
     [Tooltip("If the heuristic control should use manual keyboard movement.")]
     [SerializeField]
     private bool keyboard;
+    
+    /// <summary>
+    /// The separation distance from enemies when in automatic <see cref="Heuristic"/> mode.
+    /// </summary>
+    [Tooltip("The separation distance from enemies when in automatic heuristic mode.")]
+    [Min(float.Epsilon)]
+    [SerializeField]
+    private float distance = 5f;
     
     /// <summary>
     /// The weapon visual.
@@ -403,6 +412,29 @@ public class Player : Agent
         
         // The first position is just our current position, so get the second.
         Vector2 direction = path.GetCornersNonAlloc(_pathHelper) > 1 ? (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized : Vector2.zero;
+        if (!_hasWeapon && Instance.EnemiesCount > 0)
+        {
+            Vector3 c = Instance.Weapon.transform.position;
+            float w = Vector2.Distance(p2, new(c.x, c.z));
+            Vector2 separation = Vector2.zero;
+            foreach (Enemy enemy in Instance.EnemiesActive)
+            {
+                Vector3 e = enemy.transform.position;
+                Vector2 e2 = new(e.x, e.z);
+                float current = Vector2.Distance(p2, e2);
+                if (current > distance || current > w)
+                {
+                    continue;
+                }
+                
+                float strength = enemy.Agent.speed * (distance - current) / distance;
+                separation += (p2 - e2).normalized * Mathf.Min(strength, speed);
+            }
+            
+            direction += separation;
+            direction.Normalize();
+        }
+        
         actionsOut.ContinuousActions.Array[0] = direction.x;
         actionsOut.ContinuousActions.Array[1] = direction.y;
     }
