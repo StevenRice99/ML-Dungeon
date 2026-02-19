@@ -22,7 +22,7 @@ public class Trainer : MonoBehaviour
     [Tooltip("The number of level instances to create.")]
     [Min(1)]
     [SerializeField]
-    private int levels = 1;
+    private int levels = 16;
     
     /// <summary>
     /// The maximum size that <see cref="Level"/> instances can be up to.
@@ -37,15 +37,28 @@ public class Trainer : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        // Calculate grid dimensions for a roughly square layout.
+        int columns = Mathf.CeilToInt(Mathf.Sqrt(levels));
+        int rows = Mathf.CeilToInt((float)levels / columns);
+        
         float shift = (maxSize + 2) * levelPrefab.PieceSpacing;
-        float starting = -((levels - 1) / 2f) * shift;
+        
+        // Calculate starting offsets along the X and Z axes to keep the grid centered.
+        float startX = -((columns - 1) / 2f) * shift;
+        float startZ = -((rows - 1) / 2f) * shift;
+        
         Transform t = transform;
         Vector3 p = transform.position;
+        
         for (int i = 0; i < levels; i++)
         {
-            Level level = Instantiate(levelPrefab, p + new Vector3(starting, 0, 0), Quaternion.identity, t);
+            // Determine the 2D column and row positions for the current index.
+            int col = i % columns;
+            int row = i / columns;
+            
+            // Apply the offsets to the X and Z axes.
+            Level level = Instantiate(levelPrefab, p + new Vector3(startX + col * shift, 0, startZ + row * shift), Quaternion.identity, t);
             level.name = levelPrefab.name;
-            starting += shift;
         }
     }
 }

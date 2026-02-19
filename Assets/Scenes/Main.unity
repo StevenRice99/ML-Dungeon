@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Trainer
   levelPrefab: {fileID: 6351765883664047727, guid: e5313d9014ca66647a03410f4ed6e3d5, type: 3}
-  levels: 2
+  levels: 16
   maxSize: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
