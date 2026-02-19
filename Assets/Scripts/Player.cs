@@ -52,13 +52,6 @@ public class Player : Agent
     private GameObject weapon;
     
     /// <summary>
-    /// The <see cref="Animator"/> for the agent.
-    /// </summary>
-    [Tooltip("The parameters for the agent.")]
-    [SerializeField]
-    private Animator animator;
-    
-    /// <summary>
     /// The <see cref="Rigidbody"/> for controlling the movement of this agent.
     /// </summary>
     [Tooltip("The rigidbody for controlling the movement of this agent.")]
@@ -73,6 +66,14 @@ public class Player : Agent
     [HideInInspector]
     [SerializeField]
     private Collider col;
+    
+    /// <summary>
+    /// The <see cref="Animator"/> for the agent.
+    /// </summary>
+    [Tooltip("The animator for the agent.")]
+    [HideInInspector]
+    [SerializeField]
+    private Animator animator;
     
     /// <summary>
     /// The <see cref="BehaviorParameters"/> for the decision-making of this agent.
@@ -239,6 +240,11 @@ public class Player : Agent
         if (animator == null || animator.gameObject != gameObject)
         {
             animator = GetComponent<Animator>();
+        }
+        
+        if (animator)
+        {
+            animator.applyRootMotion = false;
         }
     }
     

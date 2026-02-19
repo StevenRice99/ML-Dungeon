@@ -9,8 +9,14 @@ using UnityEngine.AI;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(Animator))]
 public class Enemy : MonoBehaviour
 {
+    /// <summary>
+    /// Efficient <see cref="animator"/> cache for the speed variable.
+    /// </summary>
+    private static readonly int Speed = Animator.StringToHash("Speed");
+    
     /// <summary>
     /// The range that this can detect the <see cref="Level.Agent"/>.
     /// </summary>
@@ -31,7 +37,7 @@ public class Enemy : MonoBehaviour
     /// </summary>
     [Tooltip("The vertical offset to use for checking line-of-sight.")]
     [SerializeField]
-    private float offset = 0.5f;
+    private float offset = 0.25f;
     
     /// <summary>
     /// The <see cref="NavMeshAgent"/> for controlling the movement of this enemy.
@@ -48,6 +54,14 @@ public class Enemy : MonoBehaviour
     [HideInInspector]
     [SerializeField]
     private Collider col;
+    
+    /// <summary>
+    /// The <see cref="Animator"/> for the agent.
+    /// </summary>
+    [Tooltip("The animator for the agent.")]
+    [HideInInspector]
+    [SerializeField]
+    private Animator animator;
     
     /// <summary>
     /// The <see cref="Level"/> this is a part of.
@@ -72,12 +86,21 @@ public class Enemy : MonoBehaviour
     }
     
     /// <summary>
+    /// This function is called when the object becomes enabled and active.
+    /// </summary>
+    private void OnEnable()
+    {
+        animator.SetFloat(Speed, 0);
+    }
+    
+    /// <summary>
     /// Get all needed components.
     /// </summary>
     private void GetComponents()
     {
         GetNavMeshAgent();
         GetCollider();
+        GetAnimator();
     }
     
     /// <summary>
@@ -108,6 +131,22 @@ public class Enemy : MonoBehaviour
     }
     
     /// <summary>
+    /// Get the <see cref="animator"/>.
+    /// </summary>
+    private void GetAnimator()
+    {
+        if (animator == null || animator.gameObject != gameObject)
+        {
+            animator = GetComponent<Animator>();
+        }
+        
+        if (animator)
+        {
+            animator.applyRootMotion = false;
+        }
+    }
+    
+    /// <summary>
     /// Frame-rate independent MonoBehaviour.FixedUpdate message for physics calculations.
     /// </summary>
     private void FixedUpdate()
@@ -130,5 +169,13 @@ public class Enemy : MonoBehaviour
         {
             agent.destination = Instance.RandomWalkable();
         }
+    }
+    
+    /// <summary>
+    /// Update is called every frame, if the MonoBehaviour is enabled.
+    /// </summary>
+    private void Update()
+    {
+        animator.SetFloat(Speed, new Vector2(agent.velocity.x, agent.velocity.z).magnitude / agent.speed);
     }
 }

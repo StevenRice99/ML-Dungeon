@@ -84,6 +84,14 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 70fb29c9859f43b4bbfd6cc640643f6e, type: 2}
+    - target: {fileID: 5866666021909216657, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8303906797054990637, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
       propertyPath: m_Layer
       value: 2
@@ -172,6 +180,12 @@ MonoBehaviour:
   mask:
     serializedVersion: 2
     m_Bits: 1
-  offset: 0
+  offset: 0.25
   agent: {fileID: 1748127515952982965}
   col: {fileID: 3098007171682891694}
+  animator: {fileID: 6762743462102165960}
+--- !u!95 &6762743462102165960 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: bdc24538f3d16cf4489afb38ce9a10b7, type: 3}
+  m_PrefabInstance: {fileID: 914374695391941721}
+  m_PrefabAsset: {fileID: 0}
