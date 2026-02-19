@@ -384,19 +384,39 @@ public class Player : Agent
         }
         else
         {
-            // The keyboard can be used to manually override and avoid enemies.
+            // The keyboard can be used to manually override and avoid enemies. Space can also be held to act as a manual override but not have any impact on calculations.
             bool up = Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed;
             bool down = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed;
             bool right = Keyboard.current.dKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
             bool left = Keyboard.current.aKey.isPressed || Keyboard.current.rightArrowKey.isPressed;
-            if (up || down || right || left)
+            if (up || down || right || left || Keyboard.current.spaceKey.isPressed)
             {
                 actionsOut.ContinuousActions.Array[0] = right ? left ? 0f : 1f : left ? -1f : 0f;
                 actionsOut.ContinuousActions.Array[1] = up ? down ? 0f : 1f : down ? -1f : 0f;
                 return;
             }
             
-            NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
+            // Or, the mouse can be used to navigate to that point.
+            bool mouse = false;
+            if (Mouse.current.rightButton.isPressed)
+            {
+                Camera c = Camera.main;
+                if (c)
+                {
+                    Ray ray = c.ScreenPointToRay(Mouse.current.position.ReadValue());
+                    if (new Plane(Vector3.up, Instance.transform.position).Raycast(ray, out float distance))
+                    {
+                        mouse = true;
+                        NavMesh.CalculatePath(p, ray.GetPoint(distance), NavMesh.AllAreas, path);
+                    }
+                }
+            }
+            
+            // Lastly, automatically move to the weapons pickup.
+            if (!mouse)
+            {
+                NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
+            }
         }
         
         // The first position is just our current position, so get the second.
