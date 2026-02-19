@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Unity.AI.Navigation;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -173,6 +174,31 @@ public class Level : MonoBehaviour
     /// The inactive enemies.
     /// </summary>
     private readonly HashSet<Enemy> _enemiesInactive = new();
+
+    /// <summary>
+    /// Level data.
+    /// </summary>
+    private StaticParts[,] _data;
+    
+    /// <summary>
+    /// Level data.
+    /// </summary>
+    public StaticParts[,] Data
+    {
+        get
+        {
+            StaticParts[,] data = new StaticParts[size, size];
+            for (int i = 0; i < size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    data[i, j] = _data[i, j];
+                }
+            }
+            
+            return data;
+        }
+    }
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -224,7 +250,23 @@ public class Level : MonoBehaviour
     /// </summary>
     public void CreateLevel()
     {
-        PlaceLevel(GenerateLevel());
+        LevelParts[,] data = GenerateLevel();
+        _data = new StaticParts[size, size];
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                _data[i, j] = data[i, j] switch
+                {
+                    LevelParts.Wall => StaticParts.Wall,
+                    LevelParts.Start => StaticParts.Start,
+                    LevelParts.End => StaticParts.End,
+                    LevelParts.Weapon => StaticParts.Weapon,
+                    _ => StaticParts.Floor
+                };
+            }
+        }
+        PlaceLevel(data);
     }
     
     /// <summary>
@@ -754,13 +796,44 @@ public class Level : MonoBehaviour
         End = 3,
         
         /// <summary>
+        /// Where the weapon pickup is placed.
+        /// </summary>
+        Weapon = 4,
+        
+        /// <summary>
         /// Where enemies are placed.
         /// </summary>
-        Enemy = 4,
+        Enemy = 5
+    }
+    
+    /// <summary>
+    /// All static information from <see cref="LevelParts"/>, meaning enemies are not listed.
+    /// </summary>
+    public enum StaticParts
+    {
+        /// <summary>
+        /// Empty floor spaces.
+        /// </summary>
+        Floor = 0,
+        
+        /// <summary>
+        /// Wall or obstacle spaces.
+        /// </summary>
+        Wall = 1,
+        
+        /// <summary>
+        /// Where the player spawns.
+        /// </summary>
+        Start = 2,
+        
+        /// <summary>
+        /// Where the coin to end the level is placed.
+        /// </summary>
+        End = 3,
         
         /// <summary>
         /// Where the weapon pickup is placed.
         /// </summary>
-        Weapon = 5
+        Weapon = 4
     }
 }
