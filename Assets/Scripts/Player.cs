@@ -416,23 +416,18 @@ public class Player : Agent
         {
             Vector3 c = Instance.Weapon.transform.position;
             float w = Vector2.Distance(p2, new(c.x, c.z));
-            Vector2 separation = Vector2.zero;
-            foreach (Enemy enemy in Instance.EnemiesActive)
+            (Enemy enemy, Vector2 position, float distance) enemy = Instance.EnemiesActive.Select(x =>
             {
-                Vector3 e = enemy.transform.position;
-                Vector2 e2 = new(e.x, e.z);
-                float current = Vector2.Distance(p2, e2);
-                if (current > distance || current > w)
-                {
-                    continue;
-                }
                 
-                float strength = enemy.Agent.speed * (distance - current) / distance;
-                separation += (p2 - e2).normalized * Mathf.Min(strength, speed);
+                Vector3 e = x.transform.position;
+                Vector2 e2 = new(e.x, e.z);
+                return (x, e2, Vector2.Distance(p2, e2));
+            }).OrderBy(x => x.Item3).First();
+            if (enemy.enemy && distance > w)
+            {
+                direction += (p2 - enemy.position).normalized * Mathf.Min(enemy.enemy.Agent.speed * (distance - enemy.distance) / distance, speed);
+                direction.Normalize();
             }
-            
-            direction += separation;
-            direction.Normalize();
         }
         
         actionsOut.ContinuousActions.Array[0] = direction.x;
