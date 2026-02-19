@@ -17,9 +17,14 @@ using UnityEngine.InputSystem;
 public class Player : Agent
 {
     /// <summary>
-    /// Efficient <see cref="animator"/> cache for the speed.
+    /// Efficient <see cref="animator"/> cache for the speed variable.
     /// </summary>
     private static readonly int Speed = Animator.StringToHash("Speed");
+    
+    /// <summary>
+    /// Efficient <see cref="animator"/> cache for the attack state.
+    /// </summary>
+    private static readonly int Attack = Animator.StringToHash("Attack");
     
     /// <summary>
     /// How fast this agent can move.
@@ -314,6 +319,7 @@ public class Player : Agent
         // If we have the weapon, eliminate enemies.
         if (_hasWeapon)
         {
+            animator.Play(Attack);
             Instance?.Enemies.Remove(enemy);
             Destroy(enemy.gameObject);
             AddReward(eliminate);
@@ -324,7 +330,7 @@ public class Player : Agent
         AddReward(lose);
         EndEpisode();
     }
-
+    
     /// <summary>
     /// Read actions to control the player.
     /// </summary>
@@ -354,6 +360,9 @@ public class Player : Agent
         col.isTrigger = true;
         _hasWeapon = false;
         weapon?.SetActive(false);
+        
+        // Reset animations.
+        animator.SetFloat(Speed, 0);
         
         // Create the level.
         Instance?.CreateLevel();
