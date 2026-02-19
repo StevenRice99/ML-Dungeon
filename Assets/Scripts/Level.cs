@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
@@ -72,7 +73,7 @@ public class Level : MonoBehaviour
     /// </summary>
     [Tooltip("The prefab to use for the enemy. These spawn over floors, meaning their space is traversable.")]
     [SerializeField]
-    private GameObject enemyPrefab;
+    private Enemy enemyPrefab;
     
     /// <summary>
     /// The prefab for the objective coin. This space is traversable.
@@ -139,7 +140,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// The inactive enemies.
     /// </summary>
-    private readonly List<GameObject> _enemiesInactive = new();
+    private readonly HashSet<Enemy> _enemiesInactive = new();
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -431,7 +432,7 @@ public class Level : MonoBehaviour
             }
             
             enemy.gameObject.SetActive(false);
-            _enemiesInactive.Add(enemy.gameObject);
+            _enemiesInactive.Add(enemy);
         }
         
         _enemiesActive.Clear();
@@ -535,8 +536,21 @@ public class Level : MonoBehaviour
                         }
                         break;
                     case LevelParts.Enemy:
-                        if (InstantiateCenter(enemyPrefab, i, j, t, p, shift, null, _enemiesInactive).TryGetComponent(out Enemy enemy))
+                        Vector3 position = IndexToPosition(i, j, p, shift);
+                        Quaternion orientation = FaceCenter(position, p);
+                        Enemy enemy;
+                        if (_enemiesInactive.Count > 0)
                         {
+                            enemy = _enemiesInactive.First();
+                            _enemiesInactive.Remove(enemy);
+                            _enemiesActive.Add(enemy);
+                            enemy.transform.SetPositionAndRotation(position, orientation);
+                            enemy.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            enemy = Instantiate(enemyPrefab, position, orientation, t);
+                            enemy.name = enemyPrefab.name;
                             enemy.Instance = this;
                             _enemiesActive.Add(enemy);
                         }
@@ -684,7 +698,7 @@ public class Level : MonoBehaviour
         enemy.gameObject.SetActive(false);
         if (_enemiesActive.Remove(enemy))
         {
-            _enemiesInactive.Add(enemy.gameObject);
+            _enemiesInactive.Add(enemy);
         }
     }
     
