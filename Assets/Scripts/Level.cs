@@ -437,8 +437,15 @@ public class Level : MonoBehaviour
         _enemiesActive.Clear();
         
         // Hide interactable items.
-        _coin?.SetActive(false);
-        _weapon?.SetActive(false);
+        if (_coin)
+        {
+            _coin?.SetActive(false);
+        }
+        
+        if (_weapon)
+        {
+            _weapon.SetActive(false);
+        }
         
         // Place the generated level.
         Transform t = transform;
@@ -675,8 +682,10 @@ public class Level : MonoBehaviour
     public void EliminateEnemy([NotNull] Enemy enemy)
     {
         enemy.gameObject.SetActive(false);
-        _enemiesActive.Remove(enemy);
-        _enemiesInactive.Add(enemy.gameObject);
+        if (_enemiesActive.Remove(enemy))
+        {
+            _enemiesInactive.Add(enemy.gameObject);
+        }
     }
     
     /// <summary>
