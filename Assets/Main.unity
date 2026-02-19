@@ -158,7 +158,7 @@ MonoBehaviour:
   - {fileID: 3776457079191625595, guid: 4437381268562ee438cdffe996d2a3f0, type: 3}
   wallPrefabs:
   - {fileID: 5521304086427311147, guid: d27e240845ead0b4ab47689bfc25eaf3, type: 3}
-  playerPrefab: {fileID: 3020385601691468091, guid: 5ef37596a1631474baba3a67e6ad9d1b, type: 3}
+  playerPrefab: {fileID: -407068295899356925, guid: 5ef37596a1631474baba3a67e6ad9d1b, type: 3}
   enemyPrefab: {fileID: 458005802431511554, guid: 353514b755a9a4646aff6e1e8e07dace, type: 3}
   coinPrefab: {fileID: 709328490669782622, guid: 586d1922a3a5a9a4c80ceab6913bd5d8, type: 3}
   weaponPrefab: {fileID: 4320876073477296290, guid: 6cb0ef883270b854ba4219d0103d0d7e, type: 3}

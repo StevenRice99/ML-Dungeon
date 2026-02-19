@@ -66,7 +66,7 @@ public class Level : MonoBehaviour
     /// </summary>
     [Tooltip("The prefab for the player. This spawns over a floor, meaning its space is traversable.")]
     [SerializeField]
-    private GameObject playerPrefab;
+    private Player playerPrefab;
     
     /// <summary>
     /// The prefab to use for the enemy. These spawn over floors, meaning their space is traversable.
@@ -179,17 +179,11 @@ public class Level : MonoBehaviour
         if (!Agent)
         {
             Transform t = transform;
-            if (Instantiate(playerPrefab, t.position, Quaternion.identity, t).TryGetComponent(out Player player))
-            {
-                Agent = player;
-                Agent.Instance = this;
-            }
-        }
-        else
-        {
-            Agent.Instance = this;
+            Agent = Instantiate(playerPrefab, t.position, Quaternion.identity, t);
+            Agent.name = playerPrefab.name;
         }
         
+        Agent.Instance = this;
         GetNavMeshSurface();
     }
     
@@ -494,23 +488,23 @@ public class Level : MonoBehaviour
         {
             for (int j = 0; j < size; j++)
             {
+                Vector3 position;
+                Quaternion orientation;
                 switch (level[i, j])
                 {
                     case LevelParts.Start:
+                        position = IndexToPosition(i, j, p, shift);
+                        orientation = FaceCenter(position, p);
                         if (Agent == null)
                         {
-                            if (InstantiateCenter(playerPrefab, i, j, t, p, shift).TryGetComponent(out Player player))
-                            {
-                                player.Instance = this;
-                                Agent = player;
-                            }
+                            Agent = Instantiate(playerPrefab, position, orientation, t);
+                            Agent.name = playerPrefab.name;
+                            Agent.Instance = this;
                         }
                         else
                         {
-                            Vector3 current = IndexToPosition(i, j, p, shift);
-                            Agent.body.position = current;
-                            Agent.body.rotation = FaceCenter(current, p);
-                            Agent.Instance = this;
+                            Agent.body.position = position;
+                            Agent.body.rotation = orientation;
                         }
                         break;
                     case LevelParts.End:
@@ -536,8 +530,8 @@ public class Level : MonoBehaviour
                         }
                         break;
                     case LevelParts.Enemy:
-                        Vector3 position = IndexToPosition(i, j, p, shift);
-                        Quaternion orientation = FaceCenter(position, p);
+                        position = IndexToPosition(i, j, p, shift);
+                        orientation = FaceCenter(position, p);
                         Enemy enemy;
                         if (_enemiesInactive.Count > 0)
                         {
