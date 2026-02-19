@@ -17,6 +17,15 @@ public class Level : MonoBehaviour
     /// <summary>
     /// The size of the level to generate.
     /// </summary>
+    public int Size
+    {
+        get => size;
+        set => size = Mathf.Max(value, 2);
+    }
+    
+    /// <summary>
+    /// The size of the level to generate.
+    /// </summary>
     [Header("Generation")]
     [Tooltip("The size of the level to generate.")]
     [Min(2)]
@@ -26,10 +35,28 @@ public class Level : MonoBehaviour
     /// <summary>
     /// What percentage of floors to try turning into walls.
     /// </summary>
+    public float WallPercent
+    {
+        get => wallPercent;
+        set => wallPercent = Mathf.Clamp01(value);
+    }
+    
+    /// <summary>
+    /// What percentage of floors to try turning into walls.
+    /// </summary>
     [Tooltip("What percentage of floors to try turning into walls.")]
     [Range(0f, 1f)]
     [SerializeField]
     private float wallPercent = 0.1f;
+    
+    /// <summary>
+    /// The number of enemies to attempt to spawn.
+    /// </summary>
+    public int DesiredEnemies
+    {
+        get => desiredEnemies;
+        set => desiredEnemies = Mathf.Max(value, 0);
+    }
     
     /// <summary>
     /// The number of enemies to attempt to spawn.

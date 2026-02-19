@@ -139,6 +139,11 @@ public class Player : Agent
     private bool _hasWeapon;
     
     /// <summary>
+    /// The <see cref="Academy"/> learning environment parameters.
+    /// </summary>
+    private EnvironmentParameters _environment;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -357,6 +362,14 @@ public class Player : Agent
     }
     
     /// <summary>
+    /// Called the first time the agent is created.
+    /// </summary>
+    public override void Initialize()
+    {
+        _environment = Academy.Instance.EnvironmentParameters;
+    }
+
+    /// <summary>
     /// Called to reset the world.
     /// </summary>
     public override void OnEpisodeBegin()
@@ -369,8 +382,11 @@ public class Player : Agent
         // Reset animations.
         animator.SetFloat(Speed, 0);
         
-        // Create the level.
-        Instance?.CreateLevel();
+        // Create the level using any variable defined in the training.
+        Instance.Size = (int)_environment.GetWithDefault("size", Instance.Size);
+        Instance.WallPercent = _environment.GetWithDefault("walls", Instance.WallPercent);
+        Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
+        Instance.CreateLevel();
         
         // Now that the player is spawned, set back to a regular collider.
         col.isTrigger = false;
