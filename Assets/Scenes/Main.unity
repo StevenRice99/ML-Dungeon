@@ -226,7 +226,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2056854783}
   - component: {fileID: 2056854782}
-  - component: {fileID: 2056854784}
   m_Layer: 5
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -266,7 +265,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0
-  far clip plane: 20
+  far clip plane: 1010
   field of view: 60
   orthographic: 1
   orthographic size: 6
@@ -300,21 +299,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &2056854784
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2056854780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2940af8e160d45dc91b69ef87efbf0ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraHandler
-  cam: {fileID: 2056854782}
-  height: 10
-  extra: 10
 --- !u!1001 &7779330358870851662
 PrefabInstance:
   m_ObjectHideFlags: 0
