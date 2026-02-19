@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -149,12 +150,14 @@ public class Level : MonoBehaviour
     /// <summary>
     /// All weapon pickup.
     /// </summary>
-    private GameObject _weapon;
+    [NonSerialized]
+    public GameObject Weapon;
     
     /// <summary>
     /// All end-of-level coin.
     /// </summary>
-    private GameObject _coin;
+    [NonSerialized]
+    public GameObject End;
     
     /// <summary>
     /// The <see cref="Player"/>.
@@ -164,7 +167,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// The active enemies.
     /// </summary>
-    private readonly HashSet<Enemy> _enemiesActive = new();
+    public readonly HashSet<Enemy> EnemiesActive = new();
     
     /// <summary>
     /// The inactive enemies.
@@ -447,7 +450,7 @@ public class Level : MonoBehaviour
         Hide(_walls, _wallsExcess);
         
         // Reset the active enemies.
-        foreach (Enemy enemy in _enemiesActive)
+        foreach (Enemy enemy in EnemiesActive)
         {
             if (!enemy)
             {
@@ -458,17 +461,17 @@ public class Level : MonoBehaviour
             _enemiesInactive.Add(enemy);
         }
         
-        _enemiesActive.Clear();
+        EnemiesActive.Clear();
         
         // Hide interactable items.
-        if (_coin)
+        if (End)
         {
-            _coin?.SetActive(false);
+            End?.SetActive(false);
         }
         
-        if (_weapon)
+        if (Weapon)
         {
-            _weapon.SetActive(false);
+            Weapon.SetActive(false);
         }
         
         // Place the generated level.
@@ -537,25 +540,25 @@ public class Level : MonoBehaviour
                         }
                         break;
                     case LevelParts.End:
-                        if (_coin)
+                        if (End)
                         {
-                            _coin.transform.position = IndexToPosition(i, j, p, shift);
-                            _coin.SetActive(true);
+                            End.transform.position = IndexToPosition(i, j, p, shift);
+                            End.SetActive(true);
                         }
                         else
                         {
-                            _coin = InstantiatePiece(coinPrefab, i, j, t, p, shift);
+                            End = InstantiatePiece(coinPrefab, i, j, t, p, shift);
                         }
                         break;
                     case LevelParts.Weapon:
-                        if (_weapon)
+                        if (Weapon)
                         {
-                            _weapon.transform.SetPositionAndRotation(IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)));
-                            _weapon.SetActive(true);
+                            Weapon.transform.SetPositionAndRotation(IndexToPosition(i, j, p, shift), Quaternion.Euler(new(0, 90f * Random.Range(0, 4), 0)));
+                            Weapon.SetActive(true);
                         }
                         else
                         {
-                            _weapon = InstantiateFixed(weaponPrefab, i, j, t, p, shift);
+                            Weapon = InstantiateFixed(weaponPrefab, i, j, t, p, shift);
                         }
                         break;
                     case LevelParts.Enemy:
@@ -566,7 +569,7 @@ public class Level : MonoBehaviour
                         {
                             enemy = _enemiesInactive.First();
                             _enemiesInactive.Remove(enemy);
-                            _enemiesActive.Add(enemy);
+                            EnemiesActive.Add(enemy);
                             enemy.transform.SetPositionAndRotation(position, orientation);
                             enemy.gameObject.SetActive(true);
                         }
@@ -575,7 +578,7 @@ public class Level : MonoBehaviour
                             enemy = Instantiate(enemyPrefab, position, orientation, t);
                             enemy.name = enemyPrefab.name;
                             enemy.Instance = this;
-                            _enemiesActive.Add(enemy);
+                            EnemiesActive.Add(enemy);
                         }
                         break;
                     case LevelParts.Floor:
@@ -710,7 +713,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// The number of active <see cref="Enemy"/>s.
     /// </summary>
-    public int EnemiesCount => _enemiesActive.Count;
+    public int EnemiesCount => EnemiesActive.Count;
     
     /// <summary>
     /// Eliminate an <see cref="Enemy"/>.
@@ -719,7 +722,7 @@ public class Level : MonoBehaviour
     public void EliminateEnemy([NotNull] Enemy enemy)
     {
         enemy.gameObject.SetActive(false);
-        if (_enemiesActive.Remove(enemy))
+        if (EnemiesActive.Remove(enemy))
         {
             _enemiesInactive.Add(enemy);
         }

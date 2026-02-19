@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -44,6 +46,13 @@ public class Player : Agent
     [Min(float.Epsilon)]
     [SerializeField]
     private float rotation = 360f;
+    
+    /// <summary>
+    /// If the <see cref="Heuristic"/> control should use manual keyboard movement.
+    /// </summary>
+    [Tooltip("If the heuristic control should use manual keyboard movement.")]
+    [SerializeField]
+    private bool keyboard;
     
     /// <summary>
     /// The weapon visual.
@@ -144,6 +153,11 @@ public class Player : Agent
     /// The <see cref="Academy"/> learning environment parameters.
     /// </summary>
     private EnvironmentParameters _environment;
+    
+    /// <summary>
+    /// Help reduce garbage with getting where to move.
+    /// </summary>
+    private readonly Vector3[] _pathHelper = new Vector3[2];
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -359,8 +373,50 @@ public class Player : Agent
     /// <param name="actionsOut">The keyboard actions we are performing.</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        actionsOut.ContinuousActions.Array[0] = Keyboard.current.dKey.isPressed ? Keyboard.current.aKey.isPressed ? 0f : 1f : Keyboard.current.aKey.isPressed ? -1f : 0f;
-        actionsOut.ContinuousActions.Array[1] = Keyboard.current.wKey.isPressed ? Keyboard.current.sKey.isPressed ? 0f : 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
+        if (keyboard)
+        {
+            actionsOut.ContinuousActions.Array[0] = Keyboard.current.dKey.isPressed ? Keyboard.current.aKey.isPressed ? 0f : 1f : Keyboard.current.aKey.isPressed ? -1f : 0f;
+            actionsOut.ContinuousActions.Array[1] = Keyboard.current.wKey.isPressed ? Keyboard.current.sKey.isPressed ? 0f : 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
+            return;
+        }
+        
+        
+        Vector3 p = transform.position;
+        Vector2 p2 = new(p.x, p.z);
+        NavMeshPath path = new();
+        if (Instance.EnemiesCount < 1)
+        {
+            NavMesh.CalculatePath(p, Instance.End.transform.position, NavMesh.AllAreas, path);
+        }
+        else if (_hasWeapon)
+        {
+            NavMesh.CalculatePath(p, Instance.EnemiesActive.Select(x => x.transform.position).OrderBy(x =>
+            {
+                Vector2 t2 = new(x.x, x.z);
+                return Vector2.Distance(p2, t2);
+            }).First(), NavMesh.AllAreas, path);
+        }
+        else
+        {
+            NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
+        }
+        
+        // We need at least two corners to move as the first is our current position..
+        if (path.GetCornersNonAlloc(_pathHelper) > 1)
+        {
+            // Get the normalized direction to the next corner.
+            Vector2 direction = (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized;
+            
+            // Map the 3D direction to the 2D continuous actions.
+            actionsOut.ContinuousActions.Array[0] = direction.x;
+            actionsOut.ContinuousActions.Array[1] = direction.y;
+        }
+        else
+        {
+            // Stand still if we have reached the destination or have no path
+            actionsOut.ContinuousActions.Array[0] = 0f;
+            actionsOut.ContinuousActions.Array[1] = 0f;
+        }
     }
     
     /// <summary>
