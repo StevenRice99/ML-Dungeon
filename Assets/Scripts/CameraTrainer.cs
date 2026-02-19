@@ -22,6 +22,6 @@ public class CameraTrainer : CameraHandler
         }
         
         transform.position = trainer.transform.position + new Vector3(0f, Height, 0f);
-        Cam.orthographicSize = (trainer.MaxSize + 2) * trainer.LevelPrefab.PieceSpacing * Mathf.CeilToInt(Mathf.Sqrt(trainer.Levels)) / 2;
+        Cam.orthographicSize = (trainer.MaxSize + 2) * trainer.LevelPrefab.PieceSpacing * Mathf.CeilToInt(Mathf.Sqrt(trainer.Levels)) / 2f;
     }
 }
