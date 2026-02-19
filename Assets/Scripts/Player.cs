@@ -48,22 +48,6 @@ public class Player : Agent
     private float rotation = 360f;
     
     /// <summary>
-    /// If the <see cref="Heuristic"/> control should use manual keyboard movement.
-    /// </summary>
-    [Header("Heuristic")]
-    [Tooltip("If the heuristic control should use manual keyboard movement.")]
-    [SerializeField]
-    private bool keyboard;
-    
-    /// <summary>
-    /// The separation distance from enemies when in automatic <see cref="Heuristic"/> mode.
-    /// </summary>
-    [Tooltip("The separation distance from enemies when in automatic heuristic mode.")]
-    [Min(float.Epsilon)]
-    [SerializeField]
-    private float distance = 5f;
-    
-    /// <summary>
     /// The weapon visual.
     /// </summary>
     [Header("Components")]
@@ -382,14 +366,7 @@ public class Player : Agent
     /// <param name="actionsOut">The keyboard actions we are performing.</param>
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        if (keyboard)
-        {
-            actionsOut.ContinuousActions.Array[0] = Keyboard.current.dKey.isPressed ? Keyboard.current.aKey.isPressed ? 0f : 1f : Keyboard.current.aKey.isPressed ? -1f : 0f;
-            actionsOut.ContinuousActions.Array[1] = Keyboard.current.wKey.isPressed ? Keyboard.current.sKey.isPressed ? 0f : 1f : Keyboard.current.sKey.isPressed ? -1f : 0f;
-            return;
-        }
-        
-        
+        // Otherwise, automatically find a path.
         Vector3 p = transform.position;
         Vector2 p2 = new(p.x, p.z);
         NavMeshPath path = new();
@@ -407,29 +384,23 @@ public class Player : Agent
         }
         else
         {
+            // The keyboard can be used to manually override and avoid enemies.
+            bool up = Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed;
+            bool down = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed;
+            bool right = Keyboard.current.dKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
+            bool left = Keyboard.current.aKey.isPressed || Keyboard.current.rightArrowKey.isPressed;
+            if (up || down || right || left)
+            {
+                actionsOut.ContinuousActions.Array[0] = right ? left ? 0f : 1f : left ? -1f : 0f;
+                actionsOut.ContinuousActions.Array[1] = up ? down ? 0f : 1f : down ? -1f : 0f;
+                return;
+            }
+            
             NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
         }
         
         // The first position is just our current position, so get the second.
         Vector2 direction = path.GetCornersNonAlloc(_pathHelper) > 1 ? (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized : Vector2.zero;
-        if (!_hasWeapon && Instance.EnemiesCount > 0)
-        {
-            Vector3 c = Instance.Weapon.transform.position;
-            float w = Vector2.Distance(p2, new(c.x, c.z));
-            (Enemy enemy, Vector2 position, float distance) enemy = Instance.EnemiesActive.Select(x =>
-            {
-                
-                Vector3 e = x.transform.position;
-                Vector2 e2 = new(e.x, e.z);
-                return (x, e2, Vector2.Distance(p2, e2));
-            }).OrderBy(x => x.Item3).First();
-            if (enemy.enemy && distance > w)
-            {
-                direction += (p2 - enemy.position).normalized * Mathf.Min(enemy.enemy.Agent.speed * (distance - enemy.distance) / distance, speed);
-                direction.Normalize();
-            }
-        }
-        
         actionsOut.ContinuousActions.Array[0] = direction.x;
         actionsOut.ContinuousActions.Array[1] = direction.y;
     }
