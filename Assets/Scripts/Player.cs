@@ -309,7 +309,7 @@ public class Player : Agent
         }
         
         // The end-level coin uses the "Finish" tag. There must be no enemies left to finish the level.
-        if (Instance.Enemies.Count < 1 && other.CompareTag("Finish"))
+        if (Instance.EnemiesCount < 1 && other.CompareTag("Finish"))
         {
             AddReward(win);
             EndEpisode();
@@ -326,8 +326,7 @@ public class Player : Agent
         if (_hasWeapon)
         {
             animator.Play(Attack);
-            Instance?.Enemies.Remove(enemy);
-            Destroy(enemy.gameObject);
+            Instance.EliminateEnemy(enemy);
             AddReward(eliminate);
             return;
         }
