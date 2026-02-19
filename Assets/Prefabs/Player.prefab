@@ -56,6 +56,14 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 70fb29c9859f43b4bbfd6cc640643f6e, type: 2}
+    - target: {fileID: 5866666021909216657, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -181,6 +189,7 @@ MonoBehaviour:
   speed: 3
   rotation: 360
   weapon: {fileID: 885989617280085127}
+  animator: {fileID: 8377096403809976827}
   body: {fileID: 4882874150285239862}
   col: {fileID: 7270673213840974002}
   parameters: {fileID: -3681100737196805247}
@@ -191,6 +200,11 @@ MonoBehaviour:
 --- !u!4 &6795916511583640755 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8891244130364874969, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
+  m_PrefabInstance: {fileID: 2678508604273425514}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8377096403809976827 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
   m_PrefabInstance: {fileID: 2678508604273425514}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6503382089555658056

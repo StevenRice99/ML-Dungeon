@@ -13,8 +13,14 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BehaviorParameters))]
+[RequireComponent(typeof(Animator))]
 public class Player : Agent
 {
+    /// <summary>
+    /// Efficient <see cref="animator"/> cache for the speed.
+    /// </summary>
+    private static readonly int Speed = Animator.StringToHash("Speed");
+    
     /// <summary>
     /// How fast this agent can move.
     /// </summary>
@@ -39,6 +45,13 @@ public class Player : Agent
     [Tooltip("The weapon visual.")]
     [SerializeField]
     private GameObject weapon;
+    
+    /// <summary>
+    /// The <see cref="Animator"/> for the agent.
+    /// </summary>
+    [Tooltip("The parameters for the agent.")]
+    [SerializeField]
+    private Animator animator;
     
     /// <summary>
     /// The <see cref="Rigidbody"/> for controlling the movement of this agent.
@@ -143,6 +156,7 @@ public class Player : Agent
         GetRigidbody();
         GetCollider();
         GetParameters();
+        GetAnimator();
     }
     
     /// <summary>
@@ -213,6 +227,17 @@ public class Player : Agent
     }
     
     /// <summary>
+    /// Get the <see cref="animator"/>.
+    /// </summary>
+    private void GetAnimator()
+    {
+        if (animator == null || animator.gameObject != gameObject)
+        {
+            animator = GetComponent<Animator>();
+        }
+    }
+    
+    /// <summary>
     /// Frame-rate independent MonoBehaviour.FixedUpdate message for physics calculations.
     /// </summary>
     private void FixedUpdate()
@@ -236,6 +261,8 @@ public class Player : Agent
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(_velocity3), rotation * Time.deltaTime);
         }
+        
+        animator.SetFloat(Speed, _velocity.magnitude / speed);
     }
     
     /// <summary>
