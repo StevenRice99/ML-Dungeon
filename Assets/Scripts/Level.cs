@@ -42,9 +42,9 @@ public class Level : MonoBehaviour
     /// <summary>
     /// The spacing of pieces of the level.
     /// </summary>
-    [Tooltip("The spacing of pieces of the level.")]
-    [SerializeField]
-    private float pieceSpacing = 1f;
+    [field: Tooltip("The spacing of pieces of the level.")]
+    [field: SerializeField]
+    public float PieceSpacing { get; private set; } = 1f;
     
     /// <summary>
     /// The floors we can use. These spaces are traversable.
@@ -445,7 +445,7 @@ public class Level : MonoBehaviour
         // Place the generated level.
         Transform t = transform;
         Vector3 p = t.position;
-        float shift = (size - 1) / 2f * pieceSpacing;
+        float shift = (size - 1) / 2f * PieceSpacing;
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -652,7 +652,7 @@ public class Level : MonoBehaviour
     /// <returns>The position to place this at.</returns>
     private Vector3 IndexToPosition(int i, int j, Vector3 p, float shift)
     {
-        return new(p.x + i * pieceSpacing - shift, p.y, p.z + j * pieceSpacing - shift);
+        return new(p.x + i * PieceSpacing - shift, p.y, p.z + j * PieceSpacing - shift);
     }
     
     /// <summary>
