@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.MLAgents;
+using UnityEngine;
 
 /// <summary>
 /// Configure a <see cref="Camera"/> for an individual <see cref="Level"/>.
@@ -37,7 +38,6 @@ public class CameraLevel : CameraHandler
         {
             Cam.orthographicSize = (_level.Size + 2) * _level.PieceSpacing / 2f;
         }
-        
     }
     
     /// <summary>
@@ -45,6 +45,12 @@ public class CameraLevel : CameraHandler
     /// </summary>
     private void OnGUI()
     {
+        // If we are actively training using this, don't display the controls so we do not interrupt the training.
+        if (Academy.Instance.IsCommunicatorOn)
+        {
+            return;
+        }
+        
         const float x = 10;
         const float w = 150;
         const float h = 25;

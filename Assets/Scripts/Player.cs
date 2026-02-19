@@ -80,10 +80,10 @@ public class Player : Agent
     /// <summary>
     /// The <see cref="BehaviorParameters"/> for the decision-making of this agent.
     /// </summary>
-    [Tooltip("The parameters for the decision-making of this agent.")]
-    [HideInInspector]
-    [SerializeField]
-    private BehaviorParameters parameters;
+    [field: Tooltip("The parameters for the decision-making of this agent.")]
+    [field: HideInInspector]
+    [field: SerializeField]
+    public BehaviorParameters Parameters { get; private set; }
     
     /// <summary>
     /// The reward for winning the level.
@@ -212,21 +212,21 @@ public class Player : Agent
     }
     
     /// <summary>
-    /// Get the <see cref="parameters"/>.
+    /// Get the <see cref="Parameters"/>.
     /// </summary>
     private void GetParameters()
     {
-        if (parameters == null || parameters.gameObject != gameObject)
+        if (Parameters == null || Parameters.gameObject != gameObject)
         {
-            parameters = GetComponent<BehaviorParameters>();
+            Parameters = GetComponent<BehaviorParameters>();
         }
     
-        if (!parameters)
+        if (!Parameters)
         {
             return;
         }
         
-        ActionSpec spec = parameters.BrainParameters.ActionSpec;
+        ActionSpec spec = Parameters.BrainParameters.ActionSpec;
         if (spec.NumContinuousActions != 2)
         {
             spec.NumContinuousActions = 2;
@@ -236,7 +236,7 @@ public class Player : Agent
             spec.BranchSizes = Array.Empty<int>();
         }
         
-        parameters.BrainParameters.ActionSpec = spec;
+        Parameters.BrainParameters.ActionSpec = spec;
     }
     
     /// <summary>

@@ -189,10 +189,10 @@ MonoBehaviour:
   speed: 3
   rotation: 360
   weapon: {fileID: 885989617280085127}
-  animator: {fileID: 8377096403809976827}
   body: {fileID: 4882874150285239862}
   col: {fileID: 7270673213840974002}
-  parameters: {fileID: -3681100737196805247}
+  animator: {fileID: 8377096403809976827}
+  <Parameters>k__BackingField: {fileID: -3681100737196805247}
   win: 1
   eliminate: 1
   penalty: -0.01
