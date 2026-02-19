@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level
   size: 10
-  wallPercent: 0.1
+  wallPercent: 0.15
   desiredEnemies: 3
   pieceSpacing: 1
   floorPrefabs:
