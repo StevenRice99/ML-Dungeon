@@ -9,6 +9,8 @@ using Random = UnityEngine.Random;
 /// <summary>
 /// Handle creating the level.
 /// </summary>
+[AddComponentMenu("ML-Dungeon/Level")]
+[HelpURL("https://github.com/StevenRice99/ML-Dungeon")]
 [SelectionBase]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshSurface))]

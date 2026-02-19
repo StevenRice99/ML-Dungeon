@@ -1,8 +1,10 @@
 using UnityEngine;
 
 /// <summary>
-/// Allow for easily spinning an object.
+/// Allows for spinning an object around its Y-axis at a given <see cref="speed"/>.
 /// </summary>
+[AddComponentMenu("ML-Dungeon/Spin")]
+[HelpURL("https://github.com/StevenRice99/ML-Dungeon")]
 [SelectionBase]
 [DisallowMultipleComponent]
 public class Spin : MonoBehaviour
@@ -12,7 +14,7 @@ public class Spin : MonoBehaviour
     /// </summary>
     [Tooltip("The rate to spin this at.")]
     [SerializeField]
-    private float rotation = 360f;
+    private float speed = 360f;
     
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.
@@ -20,6 +22,6 @@ public class Spin : MonoBehaviour
     private void Update()
     {
         Transform t = transform;
-        t.localEulerAngles = new(0, t.localEulerAngles.y + rotation * Time.deltaTime, 0);
+        t.localEulerAngles = new(0, t.localEulerAngles.y + speed * Time.deltaTime, 0);
     }
 }

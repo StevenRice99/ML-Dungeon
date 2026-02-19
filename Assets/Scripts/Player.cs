@@ -8,6 +8,8 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// The player agent itself.
 /// </summary>
+[AddComponentMenu("ML-Dungeon/Player")]
+[HelpURL("https://github.com/StevenRice99/ML-Dungeon")]
 [SelectionBase]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]

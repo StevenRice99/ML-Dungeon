@@ -3,6 +3,8 @@
 /// <summary>
 /// Managing training of agents.
 /// </summary>
+[AddComponentMenu("ML-Dungeon/Trainer")]
+[HelpURL("https://github.com/StevenRice99/ML-Dungeon")]
 [SelectionBase]
 [DisallowMultipleComponent]
 public class Trainer : MonoBehaviour
@@ -37,11 +39,11 @@ public class Trainer : MonoBehaviour
     {
         float shift = (maxSize + 2) * levelPrefab.PieceSpacing;
         float starting = -((levels - 1) / 2f) * shift;
-        Debug.Log(starting);
         Transform t = transform;
+        Vector3 p = transform.position;
         for (int i = 0; i < levels; i++)
         {
-            Level level = Instantiate(levelPrefab, new(starting, 0, 0), Quaternion.identity, t);
+            Level level = Instantiate(levelPrefab, p + new Vector3(starting, 0, 0), Quaternion.identity, t);
             level.name = levelPrefab.name;
             starting += shift;
         }

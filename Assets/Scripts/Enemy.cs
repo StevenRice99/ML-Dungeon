@@ -5,6 +5,8 @@ using UnityEngine.AI;
 /// <summary>
 /// Handle enemy logic.
 /// </summary>
+[AddComponentMenu("ML-Dungeon/Enemy")]
+[HelpURL("https://github.com/StevenRice99/ML-Dungeon")]
 [SelectionBase]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Collider))]
