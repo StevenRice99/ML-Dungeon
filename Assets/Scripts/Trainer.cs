@@ -41,15 +41,16 @@ public class Trainer : MonoBehaviour
         int columns = Mathf.CeilToInt(Mathf.Sqrt(levels));
         int rows = Mathf.CeilToInt((float)levels / columns);
         
+        // Account for the size of dungeon tiles.
         float shift = (maxSize + 2) * levelPrefab.PieceSpacing;
         
         // Calculate starting offsets along the X and Z axes to keep the grid centered.
         float startX = -((columns - 1) / 2f) * shift;
         float startZ = -((rows - 1) / 2f) * shift;
         
+        // Place all dungeon instances.
         Transform t = transform;
         Vector3 p = transform.position;
-        
         for (int i = 0; i < levels; i++)
         {
             // Determine the 2D column and row positions for the current index.
