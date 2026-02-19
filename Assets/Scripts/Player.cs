@@ -401,22 +401,10 @@ public class Player : Agent
             NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
         }
         
-        // We need at least two corners to move as the first is our current position..
-        if (path.GetCornersNonAlloc(_pathHelper) > 1)
-        {
-            // Get the normalized direction to the next corner.
-            Vector2 direction = (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized;
-            
-            // Map the 3D direction to the 2D continuous actions.
-            actionsOut.ContinuousActions.Array[0] = direction.x;
-            actionsOut.ContinuousActions.Array[1] = direction.y;
-        }
-        else
-        {
-            // Stand still if we have reached the destination or have no path
-            actionsOut.ContinuousActions.Array[0] = 0f;
-            actionsOut.ContinuousActions.Array[1] = 0f;
-        }
+        // The first position is just our current position, so get the second.
+        Vector2 direction = path.GetCornersNonAlloc(_pathHelper) > 1 ? (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized : Vector2.zero;
+        actionsOut.ContinuousActions.Array[0] = direction.x;
+        actionsOut.ContinuousActions.Array[1] = direction.y;
     }
     
     /// <summary>
