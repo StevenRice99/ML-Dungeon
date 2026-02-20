@@ -4,6 +4,9 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// Inspector for the <see cref="DungeonSensor"/>.
+/// </summary>
 [CustomEditor(typeof(DungeonSensor), true)]
 public class DungeonSensorInspector : Editor
 {
@@ -29,7 +32,7 @@ public class DungeonSensorInspector : Editor
             float containerWidth = visualization.layout.width;
             
             // If the width is 0 or NaN, the layout engine hasn't processed the UI yet. Skip this frame.
-            if (containerWidth <= 0 || float.IsNaN(containerWidth))
+            if (containerWidth is <= 0 or float.NaN)
             {
                 return;
             }
@@ -54,7 +57,7 @@ public class DungeonSensorInspector : Editor
             // Calculate the perfect square size based on the available width and column count.
             float cellSize = containerWidth / b;
             
-            // Loop through the 2D array to build the grid
+            // Loop through the array to build the grid.
             for (int i = 0; i < a; i++)
             {
                 // Create a horizontal container for each row.
@@ -63,7 +66,7 @@ public class DungeonSensorInspector : Editor
                     style =
                     {
                         flexDirection = FlexDirection.Row,
-                        height = cellSize // Use the calculated cell size for the row height.
+                        height = cellSize
                     }
                 };
                 
