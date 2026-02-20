@@ -252,9 +252,11 @@ public class Player : Agent
             spec.BranchSizes = Array.Empty<int>();
         }
         
+        Parameters.BrainParameters.ActionSpec = spec;
         Parameters.BrainParameters.VectorObservationSize = 12;
         Parameters.BrainParameters.NumStackedVectorObservations = 1;
-        Parameters.BrainParameters.ActionSpec = spec;
+        Parameters.UseChildSensors = true;
+        Parameters.UseChildActuators = false;
     }
     
     /// <summary>

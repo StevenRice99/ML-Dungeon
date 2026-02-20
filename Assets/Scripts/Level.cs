@@ -201,46 +201,43 @@ public class Level : MonoBehaviour
     }
     
     /// <summary>
-    /// Get a <see cref="_map"/> data centered around a given coordinate which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.
+    /// Get a <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.<br/>
+    /// Unwalkable = 1<br/>
+    /// Walkable = 0.5<br/>
+    /// Walkable but has an enemy = 0
     /// </summary>
-    /// <param name="indices">The coordinates.</param>
     /// <param name="distance">How many locations away can the relative map see.</param>
-    /// <returns>The <see cref="_map"/> data centered around a given coordinate which can see a given size away.</returns>
-    public bool[,] WalkableMap(int2 indices, int distance)
+    /// <returns>The <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away.</returns>
+    public float[,] SensorMap(int distance)
     {
-        return WalkableMap(indices.x, indices.y, distance);
-    }
-    
-    /// <summary>
-    /// Get a <see cref="_map"/> data centered around a given coordinate which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.
-    /// </summary>
-    /// <param name="i">The first coordinate.</param>
-    /// <param name="j">The second coordinate.</param>
-    /// <param name="distance">How many locations away can the relative map see.</param>
-    /// <returns>The <see cref="_map"/> data centered around a given coordinate which can see a given size away.</returns>
-    public bool[,] WalkableMap(int i, int j, int distance)
-    {
+        int2 coordinates = PositionToIndex(Agent.transform.position);
+        
         // Calculate the dimension of the square grid.
         int length = distance * 2 + 1;
-        bool[,] localMap = new bool[length, length];
+        float[,] localMap = new float[length, length];
+
+        HashSet<int2> enemies = new();
+        foreach (Enemy enemy in EnemiesActive)
+        {
+            enemies.Add(PositionToIndex(enemy.transform.position));
+        }
         
         for (int x = 0; x < length; x++)
         {
             for (int y = 0; y < length; y++)
             {
                 // Translate local grid coordinates to global map coordinates.
-                int mapX = i - distance + x;
-                int mapY = j - distance + y;
+                int2 real = new(coordinates.x - distance + x, coordinates.y - distance + y);
                 
                 // Check if the calculated global coordinates are within bounds.
-                if (mapX >= 0 && mapX < size && mapY >= 0 && mapY < size)
+                if (real.x >= 0 && real.x < size && real.y >= 0 && real.y < size)
                 {
-                    localMap[x, y] = _map[mapX, mapY];
+                    localMap[x, y] = enemies.Contains(real) ? 0f : _map[real.x, real.y] ? 0.5f : 1f;
                 }
                 else
                 {
                     // Out-of-bounds locations default to unwalkable.
-                    localMap[x, y] = false; 
+                    localMap[x, y] = 1f; 
                 }
             }
         }
