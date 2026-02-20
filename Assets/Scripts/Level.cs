@@ -183,7 +183,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// Level data about what areas are walkable, with walkable spaces being true and non-walkable being false.
     /// </summary>
-    public bool[,] Data
+    public bool[,] Map
     {
         get
         {
@@ -198,6 +198,54 @@ public class Level : MonoBehaviour
             
             return data;
         }
+    }
+    
+    /// <summary>
+    /// Get a <see cref="_map"/> data centered around a given coordinate which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.
+    /// </summary>
+    /// <param name="indices">The coordinates.</param>
+    /// <param name="distance">How many locations away can the relative map see.</param>
+    /// <returns>The <see cref="_map"/> data centered around a given coordinate which can see a given size away.</returns>
+    public bool[,] WalkableMap(int2 indices, int distance)
+    {
+        return WalkableMap(indices.x, indices.y, distance);
+    }
+    
+    /// <summary>
+    /// Get a <see cref="_map"/> data centered around a given coordinate which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.
+    /// </summary>
+    /// <param name="i">The first coordinate.</param>
+    /// <param name="j">The second coordinate.</param>
+    /// <param name="distance">How many locations away can the relative map see.</param>
+    /// <returns>The <see cref="_map"/> data centered around a given coordinate which can see a given size away.</returns>
+    public bool[,] WalkableMap(int i, int j, int distance)
+    {
+        // Calculate the dimension of the square grid.
+        int length = distance * 2 + 1;
+        bool[,] localMap = new bool[length, length];
+        
+        for (int x = 0; x < length; x++)
+        {
+            for (int y = 0; y < length; y++)
+            {
+                // Translate local grid coordinates to global map coordinates.
+                int mapX = i - distance + x;
+                int mapY = j - distance + y;
+                
+                // Check if the calculated global coordinates are within bounds.
+                if (mapX >= 0 && mapX < size && mapY >= 0 && mapY < size)
+                {
+                    localMap[x, y] = _map[mapX, mapY];
+                }
+                else
+                {
+                    // Out-of-bounds locations default to unwalkable.
+                    localMap[x, y] = false; 
+                }
+            }
+        }
+        
+        return localMap;
     }
     
     /// <summary>

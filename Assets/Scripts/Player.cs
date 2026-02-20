@@ -493,7 +493,7 @@ public class Player : Agent
     {
         _environment = Academy.Instance.EnvironmentParameters;
     }
-
+    
     /// <summary>
     /// Called to reset the world.
     /// </summary>
