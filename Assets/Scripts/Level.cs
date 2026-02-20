@@ -491,19 +491,21 @@ public class Level : MonoBehaviour
         Hide(_floors, _floorsExcess);
         Hide(_walls, _wallsExcess);
         
-        // Reset the active enemies.
+        // Reset enemies.
         foreach (Enemy enemy in EnemiesActive)
         {
-            if (!enemy)
+            if (enemy)
             {
-                continue;
+                _enemiesInactive.Add(enemy);
             }
-            
-            enemy.gameObject.SetActive(false);
-            _enemiesInactive.Add(enemy);
         }
         
         EnemiesActive.Clear();
+
+        foreach (Enemy enemy in _enemiesInactive)
+        {
+            enemy.gameObject.SetActive(false);
+        }
         
         // Hide interactable items.
         if (End)
@@ -763,7 +765,7 @@ public class Level : MonoBehaviour
     /// <param name="enemy">The <see cref="Enemy"/> to eliminate.</param>
     public void EliminateEnemy([NotNull] Enemy enemy)
     {
-        enemy.gameObject.SetActive(false);
+        enemy.Eliminate();
         if (EnemiesActive.Remove(enemy))
         {
             _enemiesInactive.Add(enemy);

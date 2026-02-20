@@ -20,6 +20,16 @@ public class Enemy : MonoBehaviour
     private static readonly int Speed = Animator.StringToHash("Speed");
     
     /// <summary>
+    /// Efficient <see cref="animator"/> cache for the walk state.
+    /// </summary>
+    private static readonly int Walk = Animator.StringToHash("Walk");
+    
+    /// <summary>
+    /// Efficient <see cref="animator"/> cache for the eliminated state.
+    /// </summary>
+    private static readonly int Final = Animator.StringToHash("Eliminate");
+    
+    /// <summary>
     /// The range that this can detect the <see cref="Level.Agent"/>.
     /// </summary>
     [Tooltip("The range that this can detect the player.")]
@@ -72,6 +82,11 @@ public class Enemy : MonoBehaviour
     public Level Instance;
     
     /// <summary>
+    /// Track if this enemy is eliminated.
+    /// </summary>
+    private bool _eliminated;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -92,7 +107,12 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        col.enabled = true;
+        _eliminated = false;
+        Agent.ResetPath();
+        animator.ResetControllerState();
         animator.SetFloat(Speed, 0);
+        animator.Play(Walk);
     }
     
     /// <summary>
@@ -142,10 +162,29 @@ public class Enemy : MonoBehaviour
             animator = GetComponent<Animator>();
         }
         
-        if (animator)
+        if (!animator)
         {
-            animator.applyRootMotion = false;
+            return;
         }
+        
+        animator.applyRootMotion = false;
+        animator.writeDefaultValuesOnDisable = true;
+    }
+    
+    /// <summary>
+    /// Eliminate this enemy.
+    /// </summary>
+    public void Eliminate()
+    {
+        if (_eliminated)
+        {
+            return;
+        }
+        
+        col.enabled = false;
+        _eliminated = true;
+        Agent.ResetPath();
+        animator.Play(Final);
     }
     
     /// <summary>
@@ -153,6 +192,11 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void FixedUpdate()
     {
+        if (_eliminated)
+        {
+            return;
+        }
+        
         Vector3 p = transform.position;
         Transform target = Instance.Agent.transform;
         Vector3 t = target.position;
@@ -178,6 +222,9 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        animator.SetFloat(Speed, new Vector2(Agent.velocity.x, Agent.velocity.z).magnitude / Agent.speed);
+        if (!_eliminated)
+        {
+            animator.SetFloat(Speed, new Vector2(Agent.velocity.x, Agent.velocity.z).magnitude / Agent.speed);
+        }
     }
 }
