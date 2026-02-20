@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -97,13 +98,13 @@ public class Recording : MonoBehaviour
 #else
             Application.Quit();
 #endif
-            return "0-0-0-0";
+            return "0-000-0-0";
         }
         
         size = settings[_setting].Size;
         walls = settings[_setting].Walls;
         enemies = settings[_setting].Enemies;
-        return $"{size}-{walls}-{enemies}-{_attempt}";
+        return $"{size}-{walls.ToString(CultureInfo.InvariantCulture).Replace(".", string.Empty)}-{enemies}-{_attempt}";
     }
     
     /// <summary>
