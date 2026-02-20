@@ -820,8 +820,23 @@ public class Level : MonoBehaviour
     /// <returns>The current coordinate of the position corresponding to the level in the range of [0, 1] on each axis</returns>
     public Vector2 PositionToPercentage(Vector2 position)
     {
-        // TODO - Implement. This should be based on true coordinates, not being locked to the centers of tiles.
-        return Vector2.zero;
+        // Calculate the shift used to center the grid during generation.
+        float shift = (size - 1) / 2f * PieceSpacing;
+        
+        // Determine the minimum bounds of the level. Since the tile center is at (origin - shift), the edge is another half-spacing away.
+        Vector3 origin = transform.position;
+        float minX = origin.x - shift - PieceSpacing / 2f;
+        float minZ = origin.z - shift - PieceSpacing / 2f; 
+        
+        // The total size of the level in world units.
+        float totalSize = size * PieceSpacing;
+        
+        // Calculate the raw percentage based on distance from the minimum bounds.
+        float percentX = (position.x - minX) / totalSize;
+        float percentY = (position.y - minZ) / totalSize;
+        
+        // Return the values clamped to ensure they strictly stay within the [0, 1] range.
+        return new(Mathf.Clamp01(percentX), Mathf.Clamp01(percentY));
     }
     
     /// <summary>
