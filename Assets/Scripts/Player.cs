@@ -391,7 +391,7 @@ public class Player : Agent
     /// End an episode while accounting for any failure.
     /// </summary>
     /// <param name="failure"></param>
-    private void CustomEndEpisode(bool failure)
+    public void CustomEndEpisode(bool failure)
     {
         // Handle if recording.
         if (_recording)
@@ -541,7 +541,8 @@ public class Player : Agent
         }
         
         // The first position is just our current position, so get the second.
-        Vector2 direction = path.GetCornersNonAlloc(_pathHelper) > 1 ? (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized : Vector2.zero;
+        int points = path.GetCornersNonAlloc(_pathHelper);
+        Vector2 direction = points > 1 ? (new Vector2(_pathHelper[1].x, _pathHelper[1].z) - p2).normalized : Vector2.zero;
         actionsOut.ContinuousActions.Array[0] = direction.x;
         actionsOut.ContinuousActions.Array[1] = direction.y;
     }

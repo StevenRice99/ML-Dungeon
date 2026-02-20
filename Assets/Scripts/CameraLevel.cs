@@ -52,15 +52,26 @@ public class CameraLevel : CameraHandler
     /// </summary>
     private void OnGUI()
     {
-        // If we are actively training or recording using this, don't display the controls so we do not interrupt them.
-        if (Academy.Instance.IsCommunicatorOn || _recording)
-        {
-            return;
-        }
-        
         const float x = 10;
         const float w = 150;
         const float h = 25;
+        
+        // If we are recording, add a discard button in case an error occurs.
+        if (_recording)
+        {
+            if (GUI.Button(new(x, x, w, h), "Discard"))
+            {
+                _level.Agent.CustomEndEpisode(true);
+            }
+            
+            return;
+        }
+        
+        // If we are actively training, don't display the controls.
+        if (Academy.Instance.IsCommunicatorOn)
+        {
+            return;
+        }
         
         float y = x;
         if (GUI.Button(new(x, y, w, h), "Increase Size"))
