@@ -426,10 +426,13 @@ public class Player : Agent
         Vector3 p = transform.position;
         Vector2 p2 = new(p.x, p.z);
         NavMeshPath path = new();
+        
+        // If all enemies have been eliminated, we can win the level, so navigate there.
         if (Instance.EnemiesCount < 1)
         {
             NavMesh.CalculatePath(p, Instance.End.transform.position, NavMesh.AllAreas, path);
         }
+        // Otherwise, there are enemies, so if we have a weapon, navigate to the nearest one to eliminate them.
         else if (_hasWeapon)
         {
             NavMesh.CalculatePath(p, Instance.EnemiesActive.Select(x => x.transform.position).OrderBy(x =>
@@ -438,9 +441,11 @@ public class Player : Agent
                 return Vector2.Distance(p2, t2);
             }).First(), NavMesh.AllAreas, path);
         }
+        // Otherwise, we don't yet have the weapon, so navigate to the weapon pickup.
         else
         {
-            // The keyboard can be used to manually override and avoid enemies. Space can also be held to act as a manual override but not have any impact on calculations.
+            // The keyboard can be used to manually override and avoid enemies that the automatic pathfinding may fail.
+            // Space can also be held to act as a manual override but not have any impact on calculations.
             bool up = Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed;
             bool down = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed;
             bool right = Keyboard.current.dKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
@@ -452,7 +457,7 @@ public class Player : Agent
                 return;
             }
             
-            // Or, the mouse can be used to navigate to that point.
+            // Or, the mouse can also be used to navigate to that point.
             bool mouse = false;
             if (Mouse.current.rightButton.isPressed)
             {
@@ -468,7 +473,7 @@ public class Player : Agent
                 }
             }
             
-            // Lastly, automatically move to the weapons pickup.
+            // Lastly, automatically move to the weapons pickup if no manual overrides were added.
             if (!mouse)
             {
                 NavMesh.CalculatePath(p, Instance.Weapon.transform.position, NavMesh.AllAreas, path);
