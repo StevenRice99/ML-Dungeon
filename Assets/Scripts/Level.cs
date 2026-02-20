@@ -176,23 +176,23 @@ public class Level : MonoBehaviour
     private readonly HashSet<Enemy> _enemiesInactive = new();
 
     /// <summary>
-    /// Level data.
+    /// Level data about what areas are walkable, with walkable spaces being true and non-walkable being false.
     /// </summary>
-    private StaticParts[,] _data;
+    private bool[,] _map;
     
     /// <summary>
-    /// Level data.
+    /// Level data about what areas are walkable, with walkable spaces being true and non-walkable being false.
     /// </summary>
-    public StaticParts[,] Data
+    public bool[,] Data
     {
         get
         {
-            StaticParts[,] data = new StaticParts[size, size];
+            bool[,] data = new bool[size, size];
             for (int i = 0; i < size; i++)
             {
                 for (int j = 0; j < size; j++)
                 {
-                    data[i, j] = _data[i, j];
+                    data[i, j] = _map[i, j];
                 }
             }
             
@@ -251,19 +251,12 @@ public class Level : MonoBehaviour
     public void CreateLevel()
     {
         LevelParts[,] data = GenerateLevel();
-        _data = new StaticParts[size, size];
+        _map = new bool[size, size];
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                _data[i, j] = data[i, j] switch
-                {
-                    LevelParts.Wall => StaticParts.Wall,
-                    LevelParts.Start => StaticParts.Start,
-                    LevelParts.End => StaticParts.End,
-                    LevelParts.Weapon => StaticParts.Weapon,
-                    _ => StaticParts.Floor
-                };
+                _map[i, j] = data[i, j] != LevelParts.Wall;
             }
         }
         PlaceLevel(data);
@@ -652,25 +645,6 @@ public class Level : MonoBehaviour
     }
     
     /// <summary>
-    /// Instantiate a prefab which looks towards the center position, passed as the "p" parameter.
-    /// </summary>
-    /// <param name="prefab">The prefab to spawn.</param>
-    /// <param name="i">The first index.</param>
-    /// <param name="j">The second index.</param>
-    /// <param name="t">The transform of this.</param>
-    /// <param name="p">The position of this.</param>
-    /// <param name="shift">How much to shift each piece for centering.</param>
-    /// <param name="cache">The cache to add this to.</param>
-    /// <param name="inactive">The inactive objects we can pull from to reuse.</param>
-    /// <returns>The spawned instance.</returns>
-    private GameObject InstantiateCenter(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null, List<GameObject> inactive = null)
-    {
-        Vector3 position = IndexToPosition(i, j, p, shift);
-        GameObject go = InstantiatePiece(prefab, position, FaceCenter(position, p), t, cache, inactive);
-        return go;
-    }
-    
-    /// <summary>
     /// Instantiate a piece at a given grid offset.
     /// </summary>
     /// <param name="prefab">The prefab to spawn.</param>
@@ -873,36 +847,5 @@ public class Level : MonoBehaviour
         /// Where enemies are placed.
         /// </summary>
         Enemy = 5
-    }
-    
-    /// <summary>
-    /// All static information from <see cref="LevelParts"/>, meaning enemies are not listed.
-    /// </summary>
-    public enum StaticParts
-    {
-        /// <summary>
-        /// Empty floor spaces.
-        /// </summary>
-        Floor = 0,
-        
-        /// <summary>
-        /// Wall or obstacle spaces.
-        /// </summary>
-        Wall = 1,
-        
-        /// <summary>
-        /// Where the player spawns.
-        /// </summary>
-        Start = 2,
-        
-        /// <summary>
-        /// Where the coin to end the level is placed.
-        /// </summary>
-        End = 3,
-        
-        /// <summary>
-        /// Where the weapon pickup is placed.
-        /// </summary>
-        Weapon = 4
     }
 }
