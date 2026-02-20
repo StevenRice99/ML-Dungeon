@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Policies;
+using Unity.MLAgents.Sensors;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -153,6 +155,16 @@ public class Player : Agent
     private readonly Vector3[] _pathHelper = new Vector3[2];
     
     /// <summary>
+    /// Our previous relative position in the level.
+    /// </summary>
+    private Vector2 _previous;
+    
+    /// <summary>
+    /// The previous relative position of the nearest enemy in the level.
+    /// </summary>
+    private Vector2 _previousEnemy;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -234,15 +246,14 @@ public class Player : Agent
         }
         
         ActionSpec spec = Parameters.BrainParameters.ActionSpec;
-        if (spec.NumContinuousActions != 2)
-        {
-            spec.NumContinuousActions = 2;
-        }
+        spec.NumContinuousActions = 2;
         if (spec.NumDiscreteActions != 0)
         {
             spec.BranchSizes = Array.Empty<int>();
         }
         
+        Parameters.BrainParameters.VectorObservationSize = 12;
+        Parameters.BrainParameters.NumStackedVectorObservations = 1;
         Parameters.BrainParameters.ActionSpec = spec;
     }
     
@@ -294,7 +305,7 @@ public class Player : Agent
     /// When a GameObject collides with another GameObject, Unity calls OnTriggerEnter. This function can be a coroutine.
     /// </summary>
     /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter([NotNull] Collider other)
     {
         HandleTriggers(other);
     }
@@ -303,7 +314,7 @@ public class Player : Agent
     /// OnTriggerStay is called once per physics update for every Collider other that is touching the trigger. This function can be a coroutine.
     /// </summary>
     /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerStay([NotNull] Collider other)
     {
         HandleTriggers(other);
     }
@@ -312,7 +323,7 @@ public class Player : Agent
     /// Handle active triggers.
     /// </summary>
     /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
-    private void HandleTriggers(Collider other)
+    private void HandleTriggers([NotNull] Collider other)
     {
         // The weapon pickup uses the "Respawn" tag.
         if (other.CompareTag("Respawn"))
@@ -348,6 +359,51 @@ public class Player : Agent
         // Otherwise, give the losing penalty and end the episode.
         AddReward(lose);
         EndEpisode();
+    }
+    
+    /// <summary>
+    /// Read sensor observations.
+    /// </summary>
+    /// <param name="sensor"></param>
+    public override void CollectObservations([NotNull] VectorSensor sensor)
+    {
+        // Get our relative position. We pass both the previous and current positions so the agent can tell which way it was moving.
+        sensor.AddObservation(_previous);
+        _previous = Instance.PositionToPercentage(transform.position);
+        sensor.AddObservation(_previous);
+        
+        // Get the goal's position.
+        sensor.AddObservation(Instance.PositionToPercentage(Instance.End.transform.position));
+        
+        // To reduce the number of observations, use the weapon indication in two ways.
+        // When we don't have the weapon, give the relative coordinates of the weapon pickup.
+        // Otherwise, pass [-1, -1] when we do have the weapon.
+        sensor.AddObservation(_hasWeapon ? new(-1f, -1f) : Instance.PositionToPercentage(Instance.Weapon.transform.position));
+        
+        // If we have eliminated all enemies, pass [-1, -1] to indicate this.
+        // Since we keep track of previous enemy positions, do the same as with our position.
+        if (Instance.EnemiesCount < 1)
+        {
+            sensor.AddObservation(new Vector2(-1f, -1f));
+            sensor.AddObservation(new Vector2(-1f, -1f));
+            return;
+        }
+        
+        // Otherwise, pass the position of the nearest enemy and the previous position.
+        sensor.AddObservation(_previousEnemy);
+        _previousEnemy = NearestEnemy();
+        sensor.AddObservation(_previousEnemy);
+    }
+    
+    /// <summary>
+    /// Get the relative position of the nearest enemy.
+    /// </summary>
+    /// <returns>The relative position of the nearest enemy.</returns>
+    private Vector2 NearestEnemy()
+    {
+        Vector3 p = transform.position;
+        Vector2 p2 = new(p.x, p.z);
+        return Instance.EnemiesActive.Select(x => x.transform.position).OrderByDescending(x => Vector2.Distance(new(x.x, x.z), p2)).First();
     }
     
     /// <summary>
@@ -452,7 +508,9 @@ public class Player : Agent
         Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
         Instance.CreateLevel();
         
-        // Now that the player is spawned, set back to a regular collider.
+        // Now that the player is spawned, cache the relative position and enemy position and set back to a regular collider.
+        _previous = Instance.PositionToPercentage(transform.position);
+        _previousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
         col.isTrigger = false;
     }
 }
