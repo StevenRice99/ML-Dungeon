@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
+using Unity.MLAgents.Demonstrations;
 using Unity.MLAgents.Policies;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
@@ -165,6 +167,21 @@ public class Player : Agent
     private Vector2 _previousEnemy;
     
     /// <summary>
+    /// A <see cref="DemonstrationRecorder"/> attached to this.
+    /// </summary>
+    private DemonstrationRecorder _recorder;
+    
+    /// <summary>
+    /// The <see cref="Recording"/> instance for settings.
+    /// </summary>
+    private Recording _recording;
+    
+    /// <summary>
+    /// If there was a failure with the last scenario so we want to redo the <see cref="_recording"/> settings again with the <see cref="_recorder"/>.
+    /// </summary>
+    private bool _recordingFailure;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -178,6 +195,18 @@ public class Player : Agent
     private void Start()
     {
         GetComponents();
+        
+        // See if we are recording in this scene.
+        _recording = FindAnyObjectByType<Recording>(FindObjectsInactive.Include);
+        if (!_recording)
+        {
+            return;
+        }
+        
+        if (!TryGetComponent(out _recorder))
+        {
+            _recorder = gameObject.AddComponent<DemonstrationRecorder>();
+        }
     }
     
     /// <summary>
@@ -339,7 +368,7 @@ public class Player : Agent
         if (Instance.EnemiesCount < 1 && other.CompareTag("Finish"))
         {
             AddReward(win);
-            EndEpisode();
+            CustomEndEpisode(false);
             return;
         }
         
@@ -360,6 +389,40 @@ public class Player : Agent
         
         // Otherwise, give the losing penalty and end the episode.
         AddReward(lose);
+        CustomEndEpisode(true);
+    }
+    
+    /// <summary>
+    /// End an episode while accounting for any failure.
+    /// </summary>
+    /// <param name="failure"></param>
+    private void CustomEndEpisode(bool failure)
+    {
+        // Handle if recording.
+        if (_recording)
+        {
+            // Stop the current recording.
+            _recorder.Close();
+            _recorder.Record = false;
+            
+            // If this was a failure, discard the recording.
+            if (failure)
+            {
+                _recordingFailure = true;
+                _recorder.enabled = false;
+                string path = Path.Combine(_recorder.DemonstrationDirectory, _recorder.DemonstrationName);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                _recorder.enabled = true;
+            }
+            else
+            {
+                _recordingFailure = false;
+            }
+        }
+        
         EndEpisode();
     }
     
@@ -509,11 +572,23 @@ public class Player : Agent
         // Reset animations.
         animator.SetFloat(Speed, 0);
         
-        // Create the level using any variable defined in the training.
-        Instance.Size = (int)_environment.GetWithDefault("size", Instance.Size);
-        Instance.WallPercent = _environment.GetWithDefault("walls", Instance.WallPercent);
-        Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
-        Instance.CreateLevel();
+        // If recording, get the next parameters we should use.
+        if (_recording)
+        {
+            _recorder.DemonstrationName = _recordingFailure ? _recording.GetCurrentSettings(out int size, out float walls, out int enemies) : _recording.GetNextSettings(out size, out walls, out enemies);
+            Instance.Size = size;
+            Instance.WallPercent = walls;
+            Instance.DesiredEnemies = enemies;
+            _recorder.Record = size > 1;
+        }
+        // Otherwise, create the level using any variable defined in the training.
+        else
+        {
+            Instance.Size = (int)_environment.GetWithDefault("size", Instance.Size);
+            Instance.WallPercent = _environment.GetWithDefault("walls", Instance.WallPercent);
+            Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
+            Instance.CreateLevel();
+        }
         
         // Now that the player is spawned, cache the relative position and enemy position and set back to a regular collider.
         _previous = Instance.PositionToPercentage(transform.position);

@@ -275,9 +275,9 @@ public class Level : MonoBehaviour
     }
     
     /// <summary>
-    /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
+    /// Awake is called when an enabled script instance is being loaded.
     /// </summary>
-    private void Start()
+    private void Awake()
     {
         if (!Agent)
         {

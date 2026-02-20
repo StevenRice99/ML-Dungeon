@@ -17,6 +17,11 @@ public class CameraLevel : CameraHandler
     private Level _level;
     
     /// <summary>
+    /// Allow for checking if we are recording.
+    /// </summary>
+    private Recording _recording;
+    
+    /// <summary>
     /// Configure the <see cref="CameraHandler.Cam"/>.
     /// </summary>
     protected override void SetupCamera()
@@ -26,6 +31,8 @@ public class CameraLevel : CameraHandler
         {
             transform.position = _level.transform.position + new Vector3(0f, Height, 0f);
         }
+        
+        _recording = FindAnyObjectByType<Recording>(FindObjectsInactive.Include);
     }
     
     /// <summary>
@@ -45,8 +52,8 @@ public class CameraLevel : CameraHandler
     /// </summary>
     private void OnGUI()
     {
-        // If we are actively training using this, don't display the controls so we do not interrupt the training.
-        if (Academy.Instance.IsCommunicatorOn)
+        // If we are actively training or recording using this, don't display the controls so we do not interrupt them.
+        if (Academy.Instance.IsCommunicatorOn || _recording)
         {
             return;
         }
