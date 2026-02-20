@@ -25,6 +25,15 @@ public class DungeonSensorInspector : Editor
         // Schedule an update task on the container at roughly 60 FPS.
         visualization.schedule.Execute(() =>
         {
+            // Grab the calculated width of the container.
+            float containerWidth = visualization.layout.width;
+            
+            // If the width is 0 or NaN, the layout engine hasn't processed the UI yet. Skip this frame.
+            if (containerWidth <= 0 || float.IsNaN(containerWidth))
+            {
+                return;
+            }
+
             // Clear the container first.
             visualization.Clear();
             
@@ -36,18 +45,16 @@ public class DungeonSensorInspector : Editor
             
             // Nothing to do if the data is empty.
             int a = sensor.Sensed.GetLength(0);
-            if (a < 1)
-            {
-                return;
-            }
-            
             int b = sensor.Sensed.GetLength(1);
-            if (b < 1)
+            if (a < 1 || b < 1)
             {
                 return;
             }
             
-// Loop through the 2D array to build the grid
+            // Calculate the perfect square size based on the available width and column count.
+            float cellSize = containerWidth / b;
+            
+            // Loop through the 2D array to build the grid
             for (int i = 0; i < a; i++)
             {
                 // Create a horizontal container for each row.
@@ -56,7 +63,7 @@ public class DungeonSensorInspector : Editor
                     style =
                     {
                         flexDirection = FlexDirection.Row,
-                        height = 20 // Fixed height so the rows have a visible dimension.
+                        height = cellSize // Use the calculated cell size for the row height.
                     }
                 };
                 
@@ -66,8 +73,10 @@ public class DungeonSensorInspector : Editor
                     {
                         style =
                         {
-                            // Setting flexGrow to 1 forces every cell to expand equally, filling the row.
-                            flexGrow = 1,
+                            // Apply strict width and height to force a square.
+                            width = cellSize,
+                            height = cellSize,
+                            
                             // Evaluate the sensed value and assign the correct background color.
                             backgroundColor = sensor.Sensed[i, j] switch
                             {
