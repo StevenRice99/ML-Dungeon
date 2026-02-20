@@ -98,7 +98,7 @@ public class Recording : MonoBehaviour
 #else
             Application.Quit();
 #endif
-            return "0-000-0-0";
+            return "0-0-0-0";
         }
         
         size = settings[_setting].Size;

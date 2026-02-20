@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eb46882cbcc642a40cbe26ad8f097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Recording
-  attempts: 2
+  attempts: 10
   settings:
   - <Size>k__BackingField: 5
     <Walls>k__BackingField: 0
