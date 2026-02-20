@@ -47,11 +47,40 @@ public class DungeonSensorInspector : Editor
                 return;
             }
             
-            // TODO - Display as a color grid as follows depending on the value of each cell:
-            //  <= 0.25 - Red.
-            //  >= 0.75 - Black.
-            //  Everything else - White.
-            //  This should fill the entire width of the inspector, and each cell should be evenly sized
+// Loop through the 2D array to build the grid
+            for (int i = 0; i < a; i++)
+            {
+                // Create a horizontal container for each row.
+                VisualElement row = new()
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row,
+                        height = 20 // Fixed height so the rows have a visible dimension.
+                    }
+                };
+                
+                for (int j = 0; j < b; j++)
+                {
+                    row.Add(new()
+                    {
+                        style =
+                        {
+                            // Setting flexGrow to 1 forces every cell to expand equally, filling the row.
+                            flexGrow = 1,
+                            // Evaluate the sensed value and assign the correct background color.
+                            backgroundColor = sensor.Sensed[i, j] switch
+                            {
+                                <= 0.25f => Color.red,
+                                >= 0.75f => Color.black,
+                                _ => Color.white
+                            }
+                        }
+                    });
+                }
+                
+                visualization.Add(row);
+            }
         }).Every(16);
         
         return root;
