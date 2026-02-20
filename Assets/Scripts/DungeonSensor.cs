@@ -87,7 +87,11 @@ public class DungeonSensor : SensorComponent, ISensor
     /// Get the size of this visual sensor.
     /// </summary>
     /// <returns></returns>
-    public ObservationSpec GetObservationSpec() => ObservationSpec.Visual(1, size, size);
+    public ObservationSpec GetObservationSpec()
+    {
+        int dimension = size * 2 + 1;
+        return ObservationSpec.Visual(1, dimension, dimension);
+    }
     
     /// <summary>
     /// Indicate that this sensor cannot be compressed.

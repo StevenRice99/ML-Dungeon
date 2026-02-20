@@ -587,8 +587,9 @@ public class Player : Agent
             Instance.Size = (int)_environment.GetWithDefault("size", Instance.Size);
             Instance.WallPercent = _environment.GetWithDefault("walls", Instance.WallPercent);
             Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
-            Instance.CreateLevel();
         }
+        
+        Instance.CreateLevel();
         
         // Now that the player is spawned, cache the relative position and enemy position and set back to a regular collider.
         _previous = Instance.PositionToPercentage(transform.position);

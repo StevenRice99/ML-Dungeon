@@ -38,6 +38,23 @@ public class Recording : MonoBehaviour
     private int _attempt;
     
     /// <summary>
+    /// Awake is called when an enabled script instance is being loaded.
+    /// </summary>
+    private void Awake()
+    {
+        Level level = FindAnyObjectByType<Level>(FindObjectsInactive.Include);
+        if (!level)
+        {
+            return;
+        }
+        
+        GetCurrentSettings(out int size, out float walls, out int enemies);
+        level.Size = size;
+        level.WallPercent = walls;
+        level.DesiredEnemies = enemies;
+    }
+    
+    /// <summary>
     /// Get the next recording settings.
     /// </summary>
     /// <param name="size">The size of the level to generate.</param>
