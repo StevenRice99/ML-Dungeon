@@ -773,6 +773,58 @@ public class Level : MonoBehaviour
     }
     
     /// <summary>
+    /// Get the tile coordinates that a position falls within.
+    /// </summary>
+    /// <param name="position">The position.</param>
+    /// <param name="clamp">If the position should be clamped within bounds.</param>
+    /// <returns>The tile coordinates that a position falls within.</returns>
+    public int2 PositionToIndex(Vector3 position, bool clamp = true)
+    {
+        return PositionToIndex(new Vector2(position.x, position.z), clamp);
+    }
+    
+    /// <summary>
+    /// Get the tile coordinates that a position falls within.
+    /// </summary>
+    /// <param name="position">The position.</param>
+    /// <param name="clamp">If the position should be clamped within bounds.</param>
+    /// <returns>The tile coordinates that a position falls within.</returns>
+    public int2 PositionToIndex(Vector2 position, bool clamp = true)
+    {
+        // Calculate the same shift used during generation.
+        float shift = (size - 1) / 2f * PieceSpacing;
+        
+        // Reverse the logic from an index to a position.
+        Vector3 o = transform.position;
+        int i = Mathf.RoundToInt((position.x - o.x + shift) / PieceSpacing);
+        int j = Mathf.RoundToInt((position.y - o.z + shift) / PieceSpacing);
+        
+        // Clamp the values to ensure they safely stay within the grid array bounds.
+        return clamp ? new(Mathf.Clamp(i, 0, size - 1), Mathf.Clamp(j, 0, size - 1)) : new(i, j);
+    }
+    
+    /// <summary>
+    /// Get the current coordinate of the position corresponding to the level in the range of [0, 1] on each axis.
+    /// </summary>
+    /// <param name="position">The position.</param>
+    /// <returns>The current coordinate of the position corresponding to the level in the range of [0, 1] on each axis</returns>
+    public Vector2 PositionToPercentage(Vector3 position)
+    {
+        return PositionToPercentage(new Vector2(position.x, position.z));
+    }
+    
+    /// <summary>
+    /// Get the current coordinate of the position corresponding to the level in the range of [0, 1] on each axis.
+    /// </summary>
+    /// <param name="position">The position.</param>
+    /// <returns>The current coordinate of the position corresponding to the level in the range of [0, 1] on each axis</returns>
+    public Vector2 PositionToPercentage(Vector2 position)
+    {
+        // TODO - Implement. This should be based on true coordinates, not being locked to the centers of tiles.
+        return Vector2.zero;
+    }
+    
+    /// <summary>
     /// The flags for each part of the level.
     /// </summary>
     private enum LevelParts
