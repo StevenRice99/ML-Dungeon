@@ -177,11 +177,6 @@ public class Player : Agent
     private Recording _recording;
     
     /// <summary>
-    /// If there was a failure with the last scenario so we want to redo the <see cref="_recording"/> settings again with the <see cref="_recorder"/>.
-    /// </summary>
-    private bool _recordingFailure;
-    
-    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -408,18 +403,18 @@ public class Player : Agent
             // If this was a failure, discard the recording.
             if (failure)
             {
-                _recordingFailure = true;
                 _recorder.enabled = false;
-                string path = Path.Combine(_recorder.DemonstrationDirectory, _recorder.DemonstrationName);
+                string path = Path.Combine(_recorder.DemonstrationDirectory ?? Path.Combine(Application.dataPath, "Demonstrations"), $"{_recorder.DemonstrationName}.demo");
                 if (File.Exists(path))
                 {
                     File.Delete(path);
+                    path = $"{path}.meta";
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
                 _recorder.enabled = true;
-            }
-            else
-            {
-                _recordingFailure = false;
             }
         }
         
@@ -575,11 +570,19 @@ public class Player : Agent
         // If recording, get the next parameters we should use.
         if (_recording)
         {
-            _recorder.DemonstrationName = _recordingFailure ? _recording.GetCurrentSettings(out int size, out float walls, out int enemies) : _recording.GetNextSettings(out size, out walls, out enemies);
+            _recorder.DemonstrationName = _recording.GetCurrentSettings(out int size, out float walls, out int enemies);
+            
+            // Skip ones we are already doing.
+            while (File.Exists(Path.Combine(_recorder.DemonstrationDirectory ?? Path.Combine(Application.dataPath, "Demonstrations"), $"{_recorder.DemonstrationName}.demo")))
+            {
+                _recording.AdvanceSettings();
+                _recorder.DemonstrationName = _recording.GetCurrentSettings(out size, out walls, out enemies);
+            }
+            
             Instance.Size = size;
             Instance.WallPercent = walls;
             Instance.DesiredEnemies = enemies;
-            _recorder.Record = size > 1;
+            _recorder.Record = _recorder.DemonstrationName != "0-0-0-0";
         }
         // Otherwise, create the level using any variable defined in the training.
         else

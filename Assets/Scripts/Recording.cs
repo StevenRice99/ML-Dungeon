@@ -55,40 +55,26 @@ public class Recording : MonoBehaviour
     }
     
     /// <summary>
-    /// Get the next recording settings.
+    /// Advance to the next index information.
     /// </summary>
-    /// <param name="size">The size of the level to generate.</param>
-    /// <param name="walls">What percentage of the floors should attempt to be randomly made into walls.</param>
-    /// <param name="enemies">How many enemies to try and spawn.</param>
-    /// <returns>The name to use for the recording.</returns>
-    public string GetNextSettings(out int size, out float walls, out int enemies)
+    public void AdvanceSettings()
     {
         // See if we should advance to the next setting.
-        if (_attempt >= attempts)
+        if (++_attempt >= attempts)
         {
-            _setting++;
+            ++_setting;
             _attempt = 0;
         }
         
         // If we are done, stop.
         if (_setting >= settings.Length)
         {
-            size = 2;
-            walls = 0f;
-            enemies = 0;
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif
-            return "0-0-0-0";
         }
-        
-        // Otherwise, get the information.
-        size = settings[_setting].Size;
-        walls = settings[_setting].Walls;
-        enemies = settings[_setting].Enemies;
-        return $"{size}-{walls}-{enemies}-{_attempt++}";
     }
     
     
