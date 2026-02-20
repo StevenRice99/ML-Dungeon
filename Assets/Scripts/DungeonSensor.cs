@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.MLAgents.Sensors;
+﻿using Unity.MLAgents.Sensors;
 using UnityEngine;
 
 /// <summary>
@@ -26,6 +25,11 @@ public class DungeonSensor : SensorComponent, ISensor
     [Tooltip("The player this is attached to.")]
     [SerializeField]
     private Player player;
+    
+    /// <summary>
+    /// The last sensed data.
+    /// </summary>
+    public float[,] Sensed { get; private set; }
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -110,15 +114,15 @@ public class DungeonSensor : SensorComponent, ISensor
     /// <returns>The number of points written.</returns>
     public int Write(ObservationWriter writer)
     {
-        float[,] index = player.Instance.SensorMap(size);
-        int a = index.GetLength(0);
-        int b = index.GetLength(1);
+        Sensed = player.Instance.SensorMap(size);
+        int a = Sensed.GetLength(0);
+        int b = Sensed.GetLength(1);
         int total = 0;
         for (int i = 0; i < a; i++)
         {
             for (int j = 0; j < b; j++)
             {
-                writer[total++] = index[i, j];
+                writer[total++] = Sensed[i, j];
             }
         }
         
