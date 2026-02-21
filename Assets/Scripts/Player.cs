@@ -103,6 +103,14 @@ public class Player : Agent
     private float seconds = 10f;
     
     /// <summary>
+    /// The minimum distance to move to reset the timeout.
+    /// </summary>
+    [Tooltip("The minimum distance to move to reset the timeout.")]
+    [Min(float.Epsilon)]
+    [SerializeField]
+    private float distance = 0.25f;
+    
+    /// <summary>
     /// The <see cref="Level"/> this is a part of.
     /// </summary>
     [NonSerialized]
@@ -164,9 +172,9 @@ public class Player : Agent
     private Trainer _trainer;
     
     /// <summary>
-    /// The last coordinate the player was at.
+    /// The last position the player was at.
     /// </summary>
-    private int2 _lastCoordinate;
+    private Vector2 _lastPosition;
     
     /// <summary>
     /// The elapsed timeout time.
@@ -315,10 +323,11 @@ public class Player : Agent
         if (Parameters.IsInHeuristicMode() || !Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn)
         {
             // Check our tile.
-            int2 coordinate = Instance.PositionToIndex(transform.position);
+            Vector3 p = transform.position;
+            Vector2 p2 = new(p.x, p.z);
             
-            // If the coordinates are the same, step the time, stopping if we have been in the same tile for too long.
-            if (coordinate.x == _lastCoordinate.x && coordinate.y == _lastCoordinate.y)
+            // If the positions are the same, step the time, stopping if we have been in the same spot for too long.
+            if (Vector2.Distance(p2, _lastPosition) < distance)
             {
                 _elapsed += Time.fixedDeltaTime;
                 if (_elapsed >= seconds)
@@ -330,7 +339,7 @@ public class Player : Agent
             else
             {
                 // Otherwise, reset the timeout.
-                _lastCoordinate = coordinate;
+                _lastPosition = p2;
                 _elapsed = 0;
             }
         }
@@ -670,12 +679,13 @@ public class Player : Agent
         Instance.CreateLevel();
         
         // Now that the player is spawned, cache the relative position and enemy position.
-        _previous = Instance.PositionToPercentage(transform.position);
+        Vector3 p = transform.position;
+        _previous = Instance.PositionToPercentage(p);
         _previousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
         
         // Reset timeout values.
         _elapsed = 0;
-        _lastCoordinate = Instance.PositionToIndex(transform.position);
+        _lastPosition = new(p.x, p.z);
         
         // Set the collider back to regular.
         col.isTrigger = false;
