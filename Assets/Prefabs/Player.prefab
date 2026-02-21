@@ -214,7 +214,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonSensor
   identifier: DungeonSensor
   player: {fileID: -407068295899356925}
-  size: 7
+  size: 10
 --- !u!4 &6795916511583640755 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8891244130364874969, guid: c4f871cd6dbe4e9429b1b18da8729c6e, type: 3}
