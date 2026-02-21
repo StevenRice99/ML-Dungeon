@@ -15,7 +15,7 @@ behaviors:
       num_epoch: 3
       shared_critic: False
     network_settings:
-      vis_encode_type: resnet
+      vis_encode_type: match3
       normalize: false
       hidden_units: 128
       num_layers: 2

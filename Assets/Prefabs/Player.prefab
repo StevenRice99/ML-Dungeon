@@ -166,7 +166,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_BehaviorType: 1
+  m_BehaviorType: 0
   m_BehaviorName: DungeonPlayer
   TeamId: 0
   m_UseChildSensors: 1
@@ -198,7 +198,7 @@ MonoBehaviour:
   <Parameters>k__BackingField: {fileID: -3681100737196805247}
   win: 1
   eliminate: 1
-  penalty: -0.01
+  penalty: -0.001
   lose: -1
 --- !u!114 &3647032134443820843
 MonoBehaviour:

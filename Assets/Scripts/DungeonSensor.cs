@@ -75,7 +75,7 @@ public class DungeonSensor : SensorComponent, ISensor
              "simple - 20x20 - This must be at least 10 to use this.\n" +
              "nature_cnn - 36x36 - This must be at least 18 to use this.")]
     [SerializeField]
-    private int size = 7;
+    private int size = 10;
     
     /// <summary>
     /// Create the sensors, being just this.

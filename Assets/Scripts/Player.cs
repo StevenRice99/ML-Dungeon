@@ -111,7 +111,7 @@ public class Player : Agent
     /// </summary>
     [Tooltip("The penalty given every tick.")]
     [SerializeField]
-    private float penalty = -0.01f;
+    private float penalty = -0.001f;
     
     /// <summary>
     /// The penalty to lose when we try to fight an enemy without the weapon.

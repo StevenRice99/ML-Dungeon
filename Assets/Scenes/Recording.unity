@@ -163,44 +163,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eb46882cbcc642a40cbe26ad8f097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Recording
-  attempts: 10
+  attempts: 100
   settings:
-  - <Size>k__BackingField: 5
-    <Walls>k__BackingField: 0
-    <Enemies>k__BackingField: 0
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0
-    <Enemies>k__BackingField: 0
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.1
-    <Enemies>k__BackingField: 0
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 0
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 1
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 2
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 3
   - <Size>k__BackingField: 15
     <Walls>k__BackingField: 0.15
     <Enemies>k__BackingField: 3
-  - <Size>k__BackingField: 15
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 4
-  - <Size>k__BackingField: 15
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 5
   - <Size>k__BackingField: 20
     <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 5
-  - <Size>k__BackingField: 25
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 5
+    <Enemies>k__BackingField: 4
   - <Size>k__BackingField: 30
     <Walls>k__BackingField: 0.15
     <Enemies>k__BackingField: 5
