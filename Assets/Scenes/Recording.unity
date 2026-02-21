@@ -163,17 +163,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485eb46882cbcc642a40cbe26ad8f097, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Recording
-  attempts: 100
-  settings:
-  - <Size>k__BackingField: 10
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 3
-  - <Size>k__BackingField: 20
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 4
-  - <Size>k__BackingField: 30
-    <Walls>k__BackingField: 0.15
-    <Enemies>k__BackingField: 5
+  autoScale: 20
+  <ManualScale>k__BackingField: 20
+  number: 100000
+  <MinSize>k__BackingField: 10
+  <MaxSize>k__BackingField: 30
+  <MinWalls>k__BackingField: 0.1
+  <MaxWalls>k__BackingField: 0.2
+  <MinEnemies>k__BackingField: 1
+  <MaxEnemies>k__BackingField: 5
 --- !u!1 &1667030701
 GameObject:
   m_ObjectHideFlags: 0

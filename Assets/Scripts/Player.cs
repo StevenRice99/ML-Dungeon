@@ -174,11 +174,6 @@ public class Player : Agent
     private float _elapsed;
     
     /// <summary>
-    /// The reward to give for eliminating an enemy.
-    /// </summary>
-    private float _eliminate;
-    
-    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -409,12 +404,11 @@ public class Player : Agent
         {
             animator.Play(Attack);
             Instance.EliminateEnemy(enemy);
-            AddReward(_eliminate);
             return;
         }
         
         // Otherwise, give the losing penalty and end the episode.
-        SetReward(-1f);
+        SetReward(0);
         CustomEndEpisode(true);
     }
     
@@ -617,19 +611,19 @@ public class Player : Agent
         // If recording, get the next parameters we should use.
         if (_recording)
         {
-            _recorder.DemonstrationName = _recording.GetCurrentSettings(out int size, out float walls, out int enemies);
+            _recorder.DemonstrationName = _recording.GetRecordingSettings(out int size, out float walls, out int enemies);
             
             // Skip ones we are already doing.
             while (File.Exists(Path.Combine(_recorder.DemonstrationDirectory ?? Path.Combine(Application.dataPath, "Demonstrations"), $"{_recorder.DemonstrationName}.demo")))
             {
                 _recording.AdvanceSettings();
-                _recorder.DemonstrationName = _recording.GetCurrentSettings(out size, out walls, out enemies);
+                _recorder.DemonstrationName = _recording.GetRecordingSettings(out size, out walls, out enemies);
             }
             
             Instance.Size = size;
             Instance.WallPercent = walls;
             Instance.DesiredEnemies = enemies;
-            _recorder.Record = _recorder.DemonstrationName != "0-0-0-0";
+            _recorder.Record = _recorder.DemonstrationName != null;
         }
         // Otherwise, create the level using any variable defined in the training.
         else
@@ -680,9 +674,6 @@ public class Player : Agent
         // Reset timeout values.
         _elapsed = 0;
         _lastCoordinate = Instance.PositionToIndex(transform.position);
-        
-        // Give partial rewards for eliminating enemies.
-        _eliminate = 1f / (Instance.EnemiesCount + 1);
         
         // Set the collider back to regular.
         col.isTrigger = false;

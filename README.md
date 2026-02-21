@@ -8,7 +8,6 @@ Teaching an agent to navigate randomly generated and randomly-sized dungeons wit
 - [Agent Training](#agent-training "Agent Training")
   - [Heuristic Agent](#heuristic-agent "Heuristic Agent")
   - [Demonstration Recording](#demonstration-recording "Demonstration Recording")
-    - [Demonstration Configurations](#demonstration-configurations "Demonstration Configurations")
   - [Curriculum Learning](#curriculum-learning "Curriculum Learning")
 - [Results](#results "Results")
 - [Running](#running "Running")
@@ -41,14 +40,11 @@ The agent's actions are simply movement along both the horizontal and vertical a
 
 ## Agent Rewards
 
-- The agent is given a reward of `1` for completing a dungeon.
-- Every enemy eliminated gives a reward of `1`.
-- Getting eliminated by an enemy give a penalty of `-1`.
-- The agent is penalized `-0.001` every step to encourage learning to complete dungeons quickly.
+The reward function was kept extremely simple, being the ability to obtain a reward of one for completing the level, and no rewards for failing the level. The main reason of keeping this so simple to account for the randomization of levels. Any other potential sub-rewards, such as potentially eliminating enemies, or potential penalities, such as a penalty per step, would have a high degree of variation, making measuring progress difficult. By keeping rewards as simple as either passing the level or not, rewards could be viewed as the number of successful completions in an episode.
 
 ## Agent Training
 
-- The agent was trained for a million steps using [Proximal Policy Optimization (PPO)](https://doi.org/10.48550/arXiv.1707.06347 "Proximal Policy Optimization Algorithms"). The agent is given a [curiosity reward signal](https://doi.org/10.48550/arXiv.1705.05363 "Curiosity-driven Exploration by Self-supervised Prediction") to encourage exploration, and imitation learning is utilized, both Behavioral Cloning (BC) and [Generative Adversarial Imitation Learning (GAIL)](https://doi.org/10.48550/arXiv.1606.03476 "Generative Adversarial Imitation Learning"). The [demonstrations](#demonstration-recording "Demonstration Recording") for imitation learning were recorded using the [heuristic agent](#heuristic-agent "Heuristic Agent"). Both the [heuristic agent](#heuristic-agent "Heuristic Agent") and details on the [demonstrations recorded](#demonstration-recording "Demonstration Recording") are in their sections below.
+The agent was trained for a million steps using [Proximal Policy Optimization (PPO)](https://doi.org/10.48550/arXiv.1707.06347 "Proximal Policy Optimization Algorithms") using [training curriculum](#curriculum-learning "Curriculum Learning"). The agent is given a [curiosity reward signal](https://doi.org/10.48550/arXiv.1705.05363 "Curiosity-driven Exploration by Self-supervised Prediction") to encourage exploration, and imitation learning is utilized, both Behavioral Cloning (BC) and [Generative Adversarial Imitation Learning (GAIL)](https://doi.org/10.48550/arXiv.1606.03476 "Generative Adversarial Imitation Learning"). The [demonstrations](#demonstration-recording "Demonstration Recording") for imitation learning were recorded using the [heuristic agent](#heuristic-agent "Heuristic Agent"). Both the [heuristic agent](#heuristic-agent "Heuristic Agent") and details on the [demonstrations recorded](#demonstration-recording "Demonstration Recording") are in their sections below.
 
 ### Heuristic Agent
 
@@ -62,19 +58,28 @@ All navigation is done by finding a path using A* on the navigation mesh of the 
 
 ### Demonstration Recording
 
-The demonstration recording of the [heuristic agent](#heuristic-agent "Heuristic Agent") is done for a [set number of trials across given dungeon parameters](#demonstration-configurations). A separate recording is made for each trial, with a recording being discarded in the event that the [heuristic agent](#heuristic-agent "Heuristic Agent") fails the level by being eliminated by an enemy.
+The demonstration recording of the [heuristic agent](#heuristic-agent "Heuristic Agent") is done for a set number of trials across given dungeon parameters. A separate recording is made for each trial, with a recording being discarded in the event that the [heuristic agent](#heuristic-agent "Heuristic Agent") fails the level by being eliminated by an enemy. Demonstrations were run for a hundred thousand trials, each which had to following configurations:
 
-#### Demonstration Configurations
-
-Each configuration was run for a hundred trials with distinct level size, denoting the `X×X` size of the dungeon, the percentage of floor tiles to try and fill with floors, and the number of enemies to spawn.
-
-1. Size of `10`, `15%` walls, and `3` enemies.
-2. Size of `20`, `15%` walls, and `4` enemies.
-3. Size of `30`, `15%` walls, and `5` enemies.
+- Size = `[10, 30]`
+- Walls = `[10%, 20%]`
+- Enemies = `[1, 5]`
 
 ### Curriculum Learning
 
-TODO.
+There were three levels to the training, each allowing for more complex levels. To ensure generalization, agents would also be tested the lower-complexity levels in when in higher curriculums. The different curriculum levels were:
+
+1. Easy
+   - Size = `10`
+   - Walls = `10%`
+   - Enemies = `1`
+2. Medium
+   - Size = `[10, 20]`
+   - Walls = `[10%, 15%]`
+   - Enemies = `[1, 3]`
+3. Hard
+   - Size = `[10, 30]`
+   - Walls = `[10%, 20%]`
+   - Enemies = `[1, 5]`
 
 ## Results
 
@@ -89,7 +94,7 @@ If you just wish to see the agent in action, you can run the [web demo](https://
 To run the project in the Unity editor, there are several scenes:
 
 - **Main** - The same scene as the [web demo](https://stevenrice.ca/ml-dungeon "ML-Dungeon").
-- **Recording** - The scene to perform the [demonstration recording](#demonstration-recording "Demonstration Recording"). These are saved to the `Demonstrations` folder in the `Assets` folder. If you wish to create new recordings, you will need to delete the existing recordings in the `Demonstrations` folder, or add new [recording configurations](#demonstration-configurations "Demonstration Configurations").
+- **Recording** - The scene to perform the [demonstration recording](#demonstration-recording "Demonstration Recording"). These are saved to the `Demonstrations` folder in the `Assets` folder. If you wish to create new recordings, you will need to delete the existing recordings in the `Demonstrations` folder, or set for more trials.
 - **Training** - A scene to train multiple instances of the agent in parallel. If you wish to train the agents, you will need to follow the [run training](#run-training "Run Training") instructions.
 
 #### Run Training
