@@ -327,10 +327,12 @@ public class Player : Agent
                     return;
                 }
             }
-            
-            // Otherwise, reset the timeout.
-            _lastCoordinate = coordinate;
-            _elapsed = 0;
+            else
+            {
+                // Otherwise, reset the timeout.
+                _lastCoordinate = coordinate;
+                _elapsed = 0;
+            }
         }
         
         RequestDecision();
