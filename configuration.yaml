@@ -71,7 +71,7 @@ engine_settings:
   time_scale: 20
   target_frame_rate: -1
   capture_frame_rate: 60
-  no_graphics: false
+  no_graphics: true
   no_graphics_monitor: false
 environment_parameters:
   size:
@@ -135,7 +135,7 @@ environment_parameters:
       - name: Hard
         value: 5.0
 checkpoint_settings:
-  run_id: ppo
+  run_id: dungeon_player
   initialize_from: null
   load_model: false
   resume: false

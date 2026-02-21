@@ -646,7 +646,7 @@ public class Player : Agent
             {
                 Instance.Size = size <= _trainer.MinSize ? _trainer.MinSize : Mathf.Min(Random.Range(_trainer.MinSize, size + 1), maxSize);
                 Instance.WallPercent = walls <= _trainer.MinWalls ? _trainer.MinWalls : Mathf.Min(Random.Range(_trainer.MinWalls, walls), maxWalls);
-                Instance.DesiredEnemies = enemies <= _trainer.MinEnemies ? _trainer.MinEnemies : Mathf.Min(Random.Range(_trainer.MinEnemies, enemies), maxEnemies);
+                Instance.DesiredEnemies = enemies <= _trainer.MinEnemies ? _trainer.MinEnemies : Mathf.Min(Random.Range(_trainer.MinEnemies, enemies + 1), maxEnemies);
             }
             else
             {

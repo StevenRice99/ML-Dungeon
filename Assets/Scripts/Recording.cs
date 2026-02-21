@@ -25,7 +25,7 @@ public class Recording : MonoBehaviour
     [Tooltip("The timescale to use during the automatic heuristic phases.")]
     [Min(1f)]
     [SerializeField]
-    private float autoScale = 10f;
+    private float autoScale = 20f;
     
     /// <summary>
     /// The timescale to use during the heuristic phases which you can manually override.
