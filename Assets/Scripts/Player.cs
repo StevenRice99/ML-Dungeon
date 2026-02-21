@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using Unity.Mathematics;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Demonstrations;
@@ -122,6 +123,15 @@ public class Player : Agent
     private float lose = -1;
     
     /// <summary>
+    /// How long in seconds to timeout the agent if they get stuck in the same spot.
+    /// </summary>
+    [Header("Timeout")]
+    [Tooltip("How long in seconds to timeout the agent if they get stuck in the same spot.")]
+    [Min(float.Epsilon)]
+    [SerializeField]
+    private float seconds = 10f;
+    
+    /// <summary>
     /// The <see cref="Level"/> this is a part of.
     /// </summary>
     [NonSerialized]
@@ -181,6 +191,16 @@ public class Player : Agent
     /// A <see cref="Trainer"/> instance for settings.
     /// </summary>
     private Trainer _trainer;
+    
+    /// <summary>
+    /// The last coordinate the player was at.
+    /// </summary>
+    private int2 _lastCoordinate;
+    
+    /// <summary>
+    /// The elapsed timeout time.
+    /// </summary>
+    private float _elapsed;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -320,6 +340,28 @@ public class Player : Agent
     /// </summary>
     private void FixedUpdate()
     {
+        // If this is not in inference mode, add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
+        if (Parameters.IsInHeuristicMode() || !Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn)
+        {
+            // Check our tile.
+            int2 coordinate = Instance.PositionToIndex(transform.position);
+            
+            // If the coordinates are the same, step the time, stopping if we have been in the same tile for too long.
+            if (coordinate.x == _lastCoordinate.x && coordinate.y == _lastCoordinate.y)
+            {
+                _elapsed += Time.fixedDeltaTime;
+                if (_elapsed >= seconds)
+                {
+                    CustomEndEpisode(true);
+                    return;
+                }
+            }
+            
+            // Otherwise, reset the timeout.
+            _lastCoordinate = coordinate;
+            _elapsed = 0;
+        }
+        
         RequestDecision();
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
@@ -662,5 +704,9 @@ public class Player : Agent
         _previous = Instance.PositionToPercentage(transform.position);
         _previousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
         col.isTrigger = false;
+        
+        // Reset timeout values.
+        _elapsed = 0;
+        _lastCoordinate = Instance.PositionToIndex(transform.position);
     }
 }
