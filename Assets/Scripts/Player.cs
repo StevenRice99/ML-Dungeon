@@ -123,10 +123,10 @@ public class Player : Agent
     private float lose = -1;
     
     /// <summary>
-    /// How long in seconds to timeout the agent if they get stuck in the same spot.
+    /// How long in seconds to time out the agent if they get stuck in the same spot.
     /// </summary>
     [Header("Timeout")]
-    [Tooltip("How long in seconds to timeout the agent if they get stuck in the same spot.")]
+    [Tooltip("How long in seconds to time out the agent if they get stuck in the same spot.")]
     [Min(float.Epsilon)]
     [SerializeField]
     private float seconds = 10f;
