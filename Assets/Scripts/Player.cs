@@ -94,35 +94,6 @@ public class Player : Agent
     public BehaviorParameters Parameters { get; private set; }
     
     /// <summary>
-    /// The reward for winning the level.
-    /// </summary>
-    [Header("Rewards")]
-    [Tooltip("The reward for winning the level.")]
-    [SerializeField]
-    private float win = 1f;
-    
-    /// <summary>
-    /// The reward for eliminating an enemy.
-    /// </summary>
-    [Tooltip("The reward for eliminating an enemy.")]
-    [SerializeField]
-    private float eliminate = 1f;
-    
-    /// <summary>
-    /// The penalty given every tick.
-    /// </summary>
-    [Tooltip("The penalty given every tick.")]
-    [SerializeField]
-    private float penalty = -0.001f;
-    
-    /// <summary>
-    /// The penalty to lose when we try to fight an enemy without the weapon.
-    /// </summary>
-    [Tooltip("The penalty to lose when we try to fight an enemy without the weapon.")]
-    [SerializeField]
-    private float lose = -1;
-    
-    /// <summary>
     /// How long in seconds to time out the agent if they get stuck in the same spot.
     /// </summary>
     [Header("Timeout")]
@@ -201,6 +172,11 @@ public class Player : Agent
     /// The elapsed timeout time.
     /// </summary>
     private float _elapsed;
+    
+    /// <summary>
+    /// The reward to give for eliminating an enemy.
+    /// </summary>
+    private float _eliminate;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -366,9 +342,6 @@ public class Player : Agent
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
         body.linearVelocity = _velocity3;
-        
-        // Always tick down penalties to learn to complete levels quickly.
-        AddReward(penalty);
     }
     
     /// <summary>
@@ -420,7 +393,7 @@ public class Player : Agent
         // The end-level coin uses the "Finish" tag. There must be no enemies left to finish the level.
         if (Instance.EnemiesCount < 1 && other.CompareTag("Finish"))
         {
-            AddReward(win);
+            SetReward(1f);
             CustomEndEpisode(false);
             return;
         }
@@ -436,12 +409,12 @@ public class Player : Agent
         {
             animator.Play(Attack);
             Instance.EliminateEnemy(enemy);
-            AddReward(eliminate);
+            AddReward(_eliminate);
             return;
         }
         
         // Otherwise, give the losing penalty and end the episode.
-        AddReward(lose);
+        SetReward(-1f);
         CustomEndEpisode(true);
     }
     
@@ -700,13 +673,18 @@ public class Player : Agent
         
         Instance.CreateLevel();
         
-        // Now that the player is spawned, cache the relative position and enemy position and set back to a regular collider.
+        // Now that the player is spawned, cache the relative position and enemy position.
         _previous = Instance.PositionToPercentage(transform.position);
         _previousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
-        col.isTrigger = false;
         
         // Reset timeout values.
         _elapsed = 0;
         _lastCoordinate = Instance.PositionToIndex(transform.position);
+        
+        // Give partial rewards for eliminating enemies.
+        _eliminate = 1f / (Instance.EnemiesCount + 1);
+        
+        // Set the collider back to regular.
+        col.isTrigger = false;
     }
 }
