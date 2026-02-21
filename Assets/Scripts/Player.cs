@@ -198,6 +198,9 @@ public class Player : Agent
             return;
         }
         
+        // Set to heuristic for recording.
+        Parameters.BehaviorType = BehaviorType.HeuristicOnly;
+        
         if (!TryGetComponent(out _recorder))
         {
             _recorder = gameObject.AddComponent<DemonstrationRecorder>();
@@ -490,11 +493,21 @@ public class Player : Agent
         // If all enemies have been eliminated, we can win the level, so navigate there.
         if (Instance.EnemiesCount < 1)
         {
+            if (_recording)
+            {
+                Time.timeScale = _recording.AutoScale;
+            }
+            
             NavMesh.CalculatePath(p, Instance.End.transform.position, NavMesh.AllAreas, path);
         }
         // Otherwise, there are enemies, so if we have a weapon, navigate to the nearest one to eliminate them.
         else if (_hasWeapon)
         {
+            if (_recording)
+            {
+                Time.timeScale = _recording.AutoScale;
+            }
+            
             NavMesh.CalculatePath(p, Instance.EnemiesActive.Select(x => x.transform.position).OrderBy(x =>
             {
                 Vector2 t2 = new(x.x, x.z);
@@ -504,13 +517,18 @@ public class Player : Agent
         // Otherwise, we don't yet have the weapon, so navigate to the weapon pickup.
         else
         {
+            if (_recording)
+            {
+                // Space can also be held to fast-forward.
+                Time.timeScale = Keyboard.current.spaceKey.isPressed ? _recording.AutoScale : _recording.ManualScale;
+            }
+            
             // The keyboard can be used to manually override and avoid enemies that the automatic pathfinding may fail.
-            // Space can also be held to act as a manual override but not have any impact on calculations.
             bool up = Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed;
             bool down = Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed;
             bool right = Keyboard.current.dKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
             bool left = Keyboard.current.aKey.isPressed || Keyboard.current.rightArrowKey.isPressed;
-            if (up || down || right || left || Keyboard.current.spaceKey.isPressed)
+            if (up || down || right || left)
             {
                 actionsOut.ContinuousActions.Array[0] = right ? left ? 0f : 1f : left ? -1f : 0f;
                 actionsOut.ContinuousActions.Array[1] = up ? down ? 0f : 1f : down ? -1f : 0f;

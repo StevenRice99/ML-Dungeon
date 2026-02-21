@@ -14,8 +14,31 @@ using UnityEditor;
 public class Recording : MonoBehaviour
 {
     /// <summary>
+    /// The timescale to use during the automatic heuristic phases.
+    /// </summary>
+    public float AutoScale => Mathf.Max(autoScale, ManualScale);
+    
+    /// <summary>
+    /// The timescale to use during the automatic heuristic phases.
+    /// </summary>
+    [Header("Time")]
+    [Tooltip("The timescale to use during the automatic heuristic phases.")]
+    [Min(1f)]
+    [SerializeField]
+    private float autoScale = 10f;
+    
+    /// <summary>
+    /// The timescale to use during the heuristic phases which you can manually override.
+    /// </summary>
+    [field: Tooltip("The timescale to use during the manual heuristic phases which you can manually override.")]
+    [field: Min(1f)]
+    [field: SerializeField]
+    public float ManualScale { get; private set; } = 1f;
+    
+    /// <summary>
     /// The number of attempts per <see cref="settings"/> to record.
     /// </summary>
+    [Header("Configuration")]
     [Tooltip("The number of attempts per settings to record.")]
     [Min(1)]
     [SerializeField]

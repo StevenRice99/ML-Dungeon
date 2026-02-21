@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Recording
   attempts: 100
   settings:
-  - <Size>k__BackingField: 15
+  - <Size>k__BackingField: 10
     <Walls>k__BackingField: 0.15
     <Enemies>k__BackingField: 3
   - <Size>k__BackingField: 20
