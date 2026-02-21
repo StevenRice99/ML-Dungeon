@@ -361,10 +361,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Trainer
   <LevelPrefab>k__BackingField: {fileID: 6351765883664047727, guid: e5313d9014ca66647a03410f4ed6e3d5, type: 3}
   <Levels>k__BackingField: 16
-  maxSize: 30
-  minSize: 10
-  <MinWalls>k__BackingField: 0.1
+  <MinSize>k__BackingField: 10
+  <MaxSize>k__BackingField: 30
+  <MinWalls>k__BackingField: 0
+  <MaxWalls>k__BackingField: 0.2
   <MinEnemies>k__BackingField: 1
+  <MaxEnemies>k__BackingField: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

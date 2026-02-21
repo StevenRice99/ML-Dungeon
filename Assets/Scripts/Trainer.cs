@@ -28,18 +28,18 @@ public class Trainer : MonoBehaviour
     /// <summary>
     /// The minimum size that <see cref="Level"/> instances can be down to.
     /// </summary>
-    [Tooltip("The minimum size that level instances can be down to.")]
-    [Min(2)]
-    [SerializeField]
-    private int minSize = 10;
+    [field: Tooltip("The minimum size that level instances can be down to.")]
+    [field: Min(2)]
+    [field: SerializeField]
+    public int MinSize { get; private set; } = 10;
     
     /// <summary>
     /// The maximum size that <see cref="Level"/> instances can be up to.
     /// </summary>
-    [Tooltip("The maximum size that level instances can be up to.")]
-    [Min(2)]
-    [SerializeField]
-    private int maxSize = 30;
+    [field: Tooltip("The maximum size that level instances can be up to.")]
+    [field: Min(2)]
+    [field: SerializeField]
+    public int MaxSize { get; private set; } = 30;
     
     /// <summary>
     /// The minimum wall percentage that can be spawned in any scenario.
@@ -50,31 +50,47 @@ public class Trainer : MonoBehaviour
     public float MinWalls { get; private set; } = 0.1f;
     
     /// <summary>
+    /// The maximum wall percentage that can be spawned in any scenario.
+    /// </summary>
+    [field: Tooltip("The maximum wall percentage that can be spawned in any scenario.")]
+    [field: Range(0f, 1f)]
+    [field: SerializeField]
+    public float MaxWalls { get; private set; } = 0.2f;
+    
+    /// <summary>
     /// The minimum amount of enemies that can be spawned in any scenario.
     /// </summary>
-    [Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
+    [field: Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
     [field: Min(0)]
     [field: SerializeField]
     public int MinEnemies { get; private set; } = 1;
     
     /// <summary>
-    /// The minimum size that <see cref="Level"/> instances can be down to.
+    /// The maximum amount of enemies that can be spawned in any scenario.
     /// </summary>
-    public int MinSize => Mathf.Min(maxSize, minSize);
-    
-    /// <summary>
-    /// The maximum size that <see cref="Level"/> instances can be up to.
-    /// </summary>
-    public int MaxSize => Mathf.Max(maxSize, minSize);
+    [field: Tooltip("The maximum amount of enemies that can be spawned in any scenario.")]
+    [field: Min(0)]
+    [field: SerializeField]
+    public int MaxEnemies { get; private set; } = 5;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
     {
-        if (minSize > maxSize)
+        if (MinSize > MaxSize)
         {
-            (maxSize, minSize) = (minSize, maxSize);
+            (MaxSize, MinSize) = (MinSize, MaxSize);
+        }
+        
+        if (MinWalls > MaxWalls)
+        {
+            (MaxWalls, MinWalls) = (MinWalls, MaxWalls);
+        }
+        
+        if (MinEnemies > MaxEnemies)
+        {
+            (MaxEnemies, MinEnemies) = (MinEnemies, MaxEnemies);
         }
     }
     
@@ -90,7 +106,7 @@ public class Trainer : MonoBehaviour
         int rows = Mathf.CeilToInt((float)Levels / columns);
         
         // Account for the size of dungeon tiles.
-        float shift = (maxSize + 2) * LevelPrefab.PieceSpacing;
+        float shift = (MaxSize + 2) * LevelPrefab.PieceSpacing;
         
         // Calculate starting offsets along the X and Z axes to keep the grid centered.
         float startX = -((columns - 1) / 2f) * shift;

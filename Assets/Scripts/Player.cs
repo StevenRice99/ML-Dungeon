@@ -619,21 +619,34 @@ public class Player : Agent
         // Otherwise, create the level using any variable defined in the training.
         else
         {
+            // See if we should bound values to a trainer.
             bool trainer = _trainer;
-            int maxSize = trainer ? _trainer.MaxSize : Instance.Size;
+            int maxSize;
+            float maxWalls;
+            int maxEnemies;
+            if (trainer)
+            {
+                maxSize = _trainer.MaxSize;
+                maxWalls = _trainer.MaxWalls;
+                maxEnemies = _trainer.MaxEnemies;
+            }
+            else
+            {
+                maxSize = Instance.Size;
+                maxWalls = Instance.WallPercent;
+                maxEnemies = Instance.DesiredEnemies;
+            }
+            
             int size = (int)_environment.GetWithDefault("size", maxSize);
-            float walls = _environment.GetWithDefault("walls", Instance.WallPercent);
-            int enemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
+            float walls = _environment.GetWithDefault("walls", maxWalls);
+            int enemies = (int)_environment.GetWithDefault("enemies", maxEnemies);
             
             // If there is a trainer, ensure we keep randomizing level sizes, even down to smaller ones, to help the model generate.
             if (trainer)
             {
-                int min = _trainer.MinSize;
-                Instance.Size = size <= min ? min : Mathf.Min(Random.Range(min, size + 1), maxSize);
-                float minF = _trainer.MinWalls;
-                Instance.WallPercent = walls <= minF ? minF : Random.Range(minF, walls);
-                min = _trainer.MinEnemies;
-                Instance.DesiredEnemies = enemies <= min ? min : Random.Range(min, enemies);
+                Instance.Size = size <= _trainer.MinSize ? _trainer.MinSize : Mathf.Min(Random.Range(_trainer.MinSize, size + 1), maxSize);
+                Instance.WallPercent = walls <= _trainer.MinWalls ? _trainer.MinWalls : Mathf.Min(Random.Range(_trainer.MinWalls, walls), maxWalls);
+                Instance.DesiredEnemies = enemies <= _trainer.MinEnemies ? _trainer.MinEnemies : Mathf.Min(Random.Range(_trainer.MinEnemies, enemies), maxEnemies);
             }
             else
             {
