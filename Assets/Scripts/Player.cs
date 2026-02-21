@@ -10,6 +10,7 @@ using Unity.MLAgents.Sensors;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 /// <summary>
 /// The player agent itself.
@@ -177,6 +178,11 @@ public class Player : Agent
     private Recording _recording;
     
     /// <summary>
+    /// A <see cref="Trainer"/> instance for settings.
+    /// </summary>
+    private Trainer _trainer;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -190,6 +196,13 @@ public class Player : Agent
     private void Start()
     {
         GetComponents();
+        
+        // See if there is a trainer in the scene.
+        _trainer = FindAnyObjectByType<Trainer>();
+        if (_trainer)
+        {
+            return;
+        }
         
         // See if we are recording in this scene.
         _recording = FindAnyObjectByType<Recording>(FindObjectsInactive.Include);
@@ -606,9 +619,28 @@ public class Player : Agent
         // Otherwise, create the level using any variable defined in the training.
         else
         {
-            Instance.Size = (int)_environment.GetWithDefault("size", Instance.Size);
-            Instance.WallPercent = _environment.GetWithDefault("walls", Instance.WallPercent);
-            Instance.DesiredEnemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
+            bool trainer = _trainer;
+            int maxSize = trainer ? _trainer.MaxSize : Instance.Size;
+            int size = (int)_environment.GetWithDefault("size", maxSize);
+            float walls = _environment.GetWithDefault("walls", Instance.WallPercent);
+            int enemies = (int)_environment.GetWithDefault("enemies", Instance.DesiredEnemies);
+            
+            // If there is a trainer, ensure we keep randomizing level sizes, even down to smaller ones, to help the model generate.
+            if (trainer)
+            {
+                int min = _trainer.MinSize;
+                Instance.Size = size <= min ? min : Mathf.Min(Random.Range(min, size + 1), maxSize);
+                float minF = _trainer.MinWalls;
+                Instance.WallPercent = walls <= minF ? minF : Random.Range(minF, walls);
+                min = _trainer.MinEnemies;
+                Instance.DesiredEnemies = enemies <= min ? min : Random.Range(min, enemies);
+            }
+            else
+            {
+                Instance.Size = size;
+                Instance.WallPercent = walls;
+                Instance.DesiredEnemies = enemies;
+            }
         }
         
         Instance.CreateLevel();

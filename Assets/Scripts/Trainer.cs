@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 /// <summary>
 /// Managing training of agents.
@@ -25,24 +26,71 @@ public class Trainer : MonoBehaviour
     public int Levels { get; private set; } = 16;
     
     /// <summary>
+    /// The minimum size that <see cref="Level"/> instances can be down to.
+    /// </summary>
+    [Tooltip("The minimum size that level instances can be down to.")]
+    [Min(2)]
+    [SerializeField]
+    private int minSize = 10;
+    
+    /// <summary>
     /// The maximum size that <see cref="Level"/> instances can be up to.
     /// </summary>
-    [field: Tooltip("The maximum size that level instances can be up to.")]
-    [field: Min(2)]
+    [Tooltip("The maximum size that level instances can be up to.")]
+    [Min(2)]
+    [SerializeField]
+    private int maxSize = 30;
+    
+    /// <summary>
+    /// The minimum wall percentage that can be spawned in any scenario.
+    /// </summary>
+    [field: Tooltip("The minimum wall percentage that can be spawned in any scenario.")]
+    [field: Range(0f, 1f)]
     [field: SerializeField]
-    public int MaxSize { get; private set; } = 20;
+    public float MinWalls { get; private set; } = 0.1f;
+    
+    /// <summary>
+    /// The minimum amount of enemies that can be spawned in any scenario.
+    /// </summary>
+    [Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
+    [field: Min(0)]
+    [field: SerializeField]
+    public int MinEnemies { get; private set; } = 1;
+    
+    /// <summary>
+    /// The minimum size that <see cref="Level"/> instances can be down to.
+    /// </summary>
+    public int MinSize => Mathf.Min(maxSize, minSize);
+    
+    /// <summary>
+    /// The maximum size that <see cref="Level"/> instances can be up to.
+    /// </summary>
+    public int MaxSize => Mathf.Max(maxSize, minSize);
+    
+    /// <summary>
+    /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
+    /// </summary>
+    private void OnValidate()
+    {
+        if (minSize > maxSize)
+        {
+            (maxSize, minSize) = (minSize, maxSize);
+        }
+    }
     
     /// <summary>
     /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
     /// </summary>
     private void Start()
     {
+        OnValidate();
+        
         // Calculate grid dimensions for a roughly square layout.
         int columns = Mathf.CeilToInt(Mathf.Sqrt(Levels));
         int rows = Mathf.CeilToInt((float)Levels / columns);
         
         // Account for the size of dungeon tiles.
-        float shift = (MaxSize + 2) * LevelPrefab.PieceSpacing;
+        float shift = (maxSize + 2) * LevelPrefab.PieceSpacing;
         
         // Calculate starting offsets along the X and Z axes to keep the grid centered.
         float startX = -((columns - 1) / 2f) * shift;

@@ -73,7 +73,67 @@ engine_settings:
   capture_frame_rate: 60
   no_graphics: false
   no_graphics_monitor: false
-environment_parameters: null
+environment_parameters:
+  size:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 10.0
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 20.0
+      - name: Hard
+        value: 30.0
+  walls:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 0.1
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 0.15
+      - name: Hard
+        value: 0.2
+  enemies:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 1.0
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 0.5
+        value: 3.0
+      - name: Hard
+        value: 5.0
 checkpoint_settings:
   run_id: ppo
   initialize_from: null
