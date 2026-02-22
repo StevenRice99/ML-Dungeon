@@ -314,7 +314,7 @@ public class Level : MonoBehaviour
             }
         }
         
-        // Place the start and end in distinct corners.
+        // Place the start and weapon pickup in distinct corners.
         Vector2Int[] corners = {
             new(0, 0),
             new(0, size - 1),
