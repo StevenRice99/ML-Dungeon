@@ -196,11 +196,8 @@ MonoBehaviour:
   col: {fileID: 7270673213840974002}
   animator: {fileID: 8377096403809976827}
   <Parameters>k__BackingField: {fileID: -3681100737196805247}
-  win: 1
-  eliminate: 1
-  penalty: 0
-  lose: -1
   seconds: 10
+  distance: 0.25
 --- !u!114 &3647032134443820843
 MonoBehaviour:
   m_ObjectHideFlags: 0

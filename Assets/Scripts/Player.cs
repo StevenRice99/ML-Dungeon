@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using Unity.Mathematics;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Demonstrations;
@@ -217,6 +216,8 @@ public class Player : Agent
         {
             _recorder = gameObject.AddComponent<DemonstrationRecorder>();
         }
+        
+        _recorder.DemonstrationDirectory = RecorderPath;
     }
     
     /// <summary>
@@ -391,8 +392,18 @@ public class Player : Agent
         // The weapon pickup uses the "Respawn" tag.
         if (other.CompareTag("Respawn"))
         {
-            _hasWeapon = true;
-            weapon?.SetActive(true);
+            if (!_hasWeapon)
+            {
+                // Get a partial reward if we got this when there are enemies.
+                if (Instance.EnemiesCount > 0)
+                {
+                    SetReward(0.5f);
+                }
+                
+                _hasWeapon = true;
+                weapon?.SetActive(true);
+            }
+            
             return;
         }
         
@@ -429,18 +440,37 @@ public class Player : Agent
     /// <param name="failure"></param>
     public void CustomEndEpisode(bool failure)
     {
-        // Handle if recording.
-        if (_recording)
+        if (failure)
         {
-            // Stop the current recording.
-            _recorder.Close();
-            _recorder.Record = false;
-            
-            // If this was a failure, discard the recording.
-            if (failure)
+            // Figure out what we were trying to move in relation to, and whether or not it was the goal to determine partial rewards.
+            Vector3 goal;
+            float multiplier;
+            if (_hasWeapon || Instance.EnemiesCount < 0)
             {
+                goal = Instance.End.transform.position;
+                multiplier = 0.75f;
+            }
+            else
+            {
+                goal = Instance.Weapon.transform.position;
+                multiplier = 0.5f;
+            }
+            
+            // Calculate the Euclidean distance between the two vectors.
+            // Normalize the distance and invert it for a "closeness" score. The maximum possible distance is the square root of two, hardcoded as we know this.
+            // Clamp the result between 0 and 1 to prevent floating-point inaccuracies
+            SetReward(Mathf.Clamp01(1f - Vector2.Distance(Instance.PositionToPercentage(transform.position), Instance.PositionToPercentage(goal)) / 1.41421356f) * multiplier);
+            
+            // Handle if recording.
+            if (_recording)
+            {
+                // Stop the current recording.
+                _recorder.Close();
+                _recorder.Record = false;
+                
+                // If this was a failure, discard the recording.
                 _recorder.enabled = false;
-                string path = Path.Combine(_recorder.DemonstrationDirectory ?? Path.Combine(Application.dataPath, "Demonstrations"), $"{_recorder.DemonstrationName}.demo");
+                string path = Path.Combine(_recorder.DemonstrationDirectory ?? RecorderPath, $"{_recorder.DemonstrationName}.demo");
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -450,11 +480,35 @@ public class Player : Agent
                         File.Delete(path);
                     }
                 }
+                
                 _recorder.enabled = true;
             }
         }
         
         EndEpisode();
+    }
+    
+    /// <summary>
+    /// The default path for demonstration recording.
+    /// </summary>
+    private static string RecorderPath
+    {
+        get
+        {
+            string path = Path.GetDirectoryName(Application.dataPath);
+            if (path == null)
+            {
+                return Application.dataPath;
+            }
+            
+            path = Path.Combine(path, "Demonstrations");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            
+            return path;
+        }
     }
     
     /// <summary>
@@ -576,10 +630,10 @@ public class Player : Agent
                 if (c)
                 {
                     Ray ray = c.ScreenPointToRay(Mouse.current.position.ReadValue());
-                    if (new Plane(Vector3.up, Instance.transform.position).Raycast(ray, out float distance))
+                    if (new Plane(Vector3.up, Instance.transform.position).Raycast(ray, out float d))
                     {
                         mouse = true;
-                        NavMesh.CalculatePath(p, ray.GetPoint(distance), NavMesh.AllAreas, path);
+                        NavMesh.CalculatePath(p, ray.GetPoint(d), NavMesh.AllAreas, path);
                     }
                 }
             }
