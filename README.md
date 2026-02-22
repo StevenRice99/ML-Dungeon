@@ -61,8 +61,8 @@ All navigation is done by finding a path using A* on the navigation mesh of the 
 The demonstration recording of the [heuristic agent](#heuristic-agent "Heuristic Agent") is done for a set number of trials across given dungeon parameters. A separate recording is made for each trial, with a recording being discarded in the event that the [heuristic agent](#heuristic-agent "Heuristic Agent") fails the level by being eliminated by an enemy. Demonstrations were run for a hundred thousand trials, each which had to following configurations:
 
 - Size = `[10, 30]`
-- Walls = `[10%, 20%]`
-- Enemies = `[1, 5]`
+- Walls = `[0%, 20%]`
+- Enemies = `[0, 3]`
 
 ### Curriculum Learning
 
@@ -70,16 +70,16 @@ There were three levels to the training, each allowing for more complex levels. 
 
 1. Easy
    - Size = `10`
-   - Walls = `10%`
-   - Enemies = `1`
+   - Walls = `0%`
+   - Enemies = `0`
 2. Medium
    - Size = `[10, 20]`
-   - Walls = `[10%, 15%]`
-   - Enemies = `[1, 3]`
+   - Walls = `[0%, 10%]`
+   - Enemies = `[0, 1]`
 3. Hard
    - Size = `[10, 30]`
-   - Walls = `[10%, 20%]`
-   - Enemies = `[1, 5]`
+   - Walls = `[0%, 20%]`
+   - Enemies = `[1, 3]`
 
 ## Results
 

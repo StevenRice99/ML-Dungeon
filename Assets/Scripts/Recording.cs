@@ -40,7 +40,7 @@ public class Recording : MonoBehaviour
     [Tooltip("The number of attempts per settings to record.")]
     [Min(1)]
     [SerializeField]
-    private int number = 10000;
+    private int number = 2500;
     
     /// <summary>
     /// The minimum size that <see cref="Level"/> instances can be down to.
@@ -64,7 +64,7 @@ public class Recording : MonoBehaviour
     [field: Tooltip("The minimum wall percentage that can be spawned in any scenario.")]
     [field: Range(0f, 1f)]
     [field: SerializeField]
-    public float MinWalls { get; private set; } = 0.1f;
+    public float MinWalls { get; private set; }
     
     /// <summary>
     /// The maximum wall percentage that can be spawned in any scenario.
@@ -80,7 +80,7 @@ public class Recording : MonoBehaviour
     [field: Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
     [field: Min(0)]
     [field: SerializeField]
-    public int MinEnemies { get; private set; } = 1;
+    public int MinEnemies { get; private set; }
     
     /// <summary>
     /// The maximum amount of enemies that can be spawned in any scenario.

@@ -168,10 +168,10 @@ MonoBehaviour:
   number: 10000
   <MinSize>k__BackingField: 10
   <MaxSize>k__BackingField: 30
-  <MinWalls>k__BackingField: 0.1
+  <MinWalls>k__BackingField: 0
   <MaxWalls>k__BackingField: 0.2
-  <MinEnemies>k__BackingField: 1
-  <MaxEnemies>k__BackingField: 5
+  <MinEnemies>k__BackingField: 0
+  <MaxEnemies>k__BackingField: 3
 --- !u!1 &1667030701
 GameObject:
   m_ObjectHideFlags: 0
