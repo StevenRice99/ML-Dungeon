@@ -155,12 +155,12 @@ public class Player : Agent
     /// <summary>
     /// Our previous relative position in the level.
     /// </summary>
-    private Vector2 _previous;
+    public Vector2 Previous { get; private set; }
     
     /// <summary>
     /// The previous relative position of the nearest enemy in the level.
     /// </summary>
-    private Vector2 _previousEnemy;
+    public Vector2 PreviousEnemy { get; private set; }
     
     /// <summary>
     /// A <see cref="DemonstrationRecorder"/> attached to this.
@@ -490,9 +490,9 @@ public class Player : Agent
     public override void CollectObservations([NotNull] VectorSensor sensor)
     {
         // Get our relative position. We pass both the previous and current positions so the agent can tell which way it was moving.
-        sensor.AddObservation(_previous);
-        _previous = Instance.PositionToPercentage(transform.position);
-        sensor.AddObservation(_previous);
+        sensor.AddObservation(Previous);
+        Previous = Instance.PositionToPercentage(transform.position);
+        sensor.AddObservation(Previous);
         
         // To reduce the number of observations, use the weapon indication in two ways.
         // When we don't have the weapon, give the relative coordinates of the weapon pickup.
@@ -509,9 +509,9 @@ public class Player : Agent
         }
         
         // Otherwise, pass the position of the nearest enemy and the previous position.
-        sensor.AddObservation(_previousEnemy);
-        _previousEnemy = NearestEnemy();
-        sensor.AddObservation(_previousEnemy);
+        sensor.AddObservation(PreviousEnemy);
+        PreviousEnemy = NearestEnemy();
+        sensor.AddObservation(PreviousEnemy);
     }
     
     /// <summary>
@@ -522,7 +522,11 @@ public class Player : Agent
     {
         Vector3 p = transform.position;
         Vector2 p2 = new(p.x, p.z);
-        return Instance.EnemiesActive.Select(x => x.transform.position).OrderByDescending(x => Vector2.Distance(new(x.x, x.z), p2)).First();
+        return Instance.PositionToPercentage(Instance.EnemiesActive.Select(x =>
+        {
+            Vector3 t = x.transform.position;
+            return new Vector2(t.x, t.z);
+        }).OrderBy(x => Vector2.Distance(new(x.x, x.y), p2)).First());
     }
     
     /// <summary>
@@ -693,8 +697,8 @@ public class Player : Agent
         
         // Now that the player is spawned, cache the relative position and enemy position.
         Vector3 p = transform.position;
-        _previous = Instance.PositionToPercentage(p);
-        _previousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
+        Previous = Instance.PositionToPercentage(p);
+        PreviousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
         
         // Reset timeout values.
         _elapsed = 0;

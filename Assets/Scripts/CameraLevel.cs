@@ -125,5 +125,9 @@ public class CameraLevel : CameraHandler
         GUI.Label(new(xr, y, w, h), $"Step: {_level.Agent.StepCount}");
         y += h + x;
         GUI.Label(new(xr, y, w, h), $"Score: {_level.Agent.GetCumulativeReward()}");
+        y += h + x;
+        GUI.Label(new(xr, y, w, h), $"Position: {_level.Agent.Previous}");
+        y += h + x;
+        GUI.Label(new(xr, y, w, h), $"Enemy: {_level.Agent.PreviousEnemy}");
     }
 }
