@@ -53,6 +53,13 @@ public class Player : Agent
     private float rotation = 360f;
     
     /// <summary>
+    /// The penalty for movement cost.
+    /// </summary>
+    [Tooltip("The penalty for movement cost.")]
+    [SerializeField]
+    private float penalty = -0.0001f;
+    
+    /// <summary>
     /// The weapon visual.
     /// </summary>
     [Header("Components")]
@@ -179,11 +186,6 @@ public class Player : Agent
     /// The elapsed timeout time.
     /// </summary>
     private float _elapsed;
-    
-    /// <summary>
-    /// The per-enemy reward amount to give.
-    /// </summary>
-    private float _enemyReward;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -350,6 +352,7 @@ public class Player : Agent
             }
         }
         
+        AddReward(penalty);
         RequestDecision();
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
@@ -371,46 +374,26 @@ public class Player : Agent
     }
     
     /// <summary>
-    /// When a GameObject collides with another GameObject, Unity calls OnTriggerEnter. This function can be a coroutine.
-    /// </summary>
-    /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
-    private void OnTriggerEnter([NotNull] Collider other)
-    {
-        HandleTriggers(other);
-    }
-    
-    /// <summary>
     /// OnTriggerStay is called once per physics update for every Collider other that is touching the trigger. This function can be a coroutine.
     /// </summary>
     /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
     private void OnTriggerStay([NotNull] Collider other)
     {
-        HandleTriggers(other);
-    }
-    
-    /// <summary>
-    /// Handle active triggers.
-    /// </summary>
-    /// <param name="other">The other <see cref="Collider"/> involved in this collision.</param>
-    private void HandleTriggers([NotNull] Collider other)
-    {
         // The weapon pickup uses the "Respawn" tag.
         if (other.CompareTag("Respawn"))
         {
-            // If there are no enemies in the level, the weapon's pickup gives the full reward.
-            if (Instance.EnemiesCount < 1)
-            {
-                SetReward(1f);
-                CustomEndEpisode(false);
-                return;
-            }
-            
-            // Get a partial reward for reaching the weapon pickup.
+            // Get a reward for reaching the pickup.
             if (!_hasWeapon)
             {
-                SetReward(0.5f);
                 _hasWeapon = true;
                 weapon?.SetActive(true);
+                SetReward(1f);
+            }
+            
+            // If there are no enemies in the level, end it.
+            if (Instance.EnemiesCount < 1)
+            {
+                CustomEndEpisode(false);
             }
             
             return;
@@ -425,6 +408,7 @@ public class Player : Agent
         // If we don't have the weapon, the agent lost, so end the episode.
         if (!_hasWeapon)
         {
+            SetReward(-1f);
             CustomEndEpisode(true);
             return;
         }
@@ -432,17 +416,13 @@ public class Player : Agent
         // Otherwise, eliminate the enemy.
         animator.Play(Attack);
         Instance.EliminateEnemy(enemy);
-        
-        // Give a partial reward for eliminating one.
-        if (Instance.EnemiesCount >= 1)
-        {
-            AddReward(_enemyReward);
-            return;
-        }
-        
-        // If this was the last enemy, give the maximum reward and end the episode.
         SetReward(1f);
-        CustomEndEpisode(false);
+        
+        // If this was the last enemy, end the episode.
+        if (Instance.EnemiesCount < 1)
+        {
+            CustomEndEpisode(false);
+        }
     }
     
     /// <summary>
@@ -453,15 +433,6 @@ public class Player : Agent
     {
         if (failure)
         {
-            // Figure out what we were trying to move in relation to, and whether or not it was the goal to determine partial rewards.
-            // Calculate the Euclidean distance between the two vectors.
-            // Normalize the distance and invert it for a "closeness" score. The maximum possible distance is the square root of two, hardcoded as we know this.
-            // Clamp the result between 0 and 1 to prevent floating-point inaccuracies
-            if (!_hasWeapon)
-            {
-                SetReward(Mathf.Clamp01(1f - Vector2.Distance(Instance.PositionToPercentage(transform.position), Instance.PositionToPercentage(Instance.Weapon.transform.position)) / 1.41421356f) * 0.5f);
-            }
-            
             // Handle if recording.
             if (_recording)
             {
@@ -728,9 +699,6 @@ public class Player : Agent
         // Reset timeout values.
         _elapsed = 0;
         _lastPosition = new(p.x, p.z);
-        
-        // Calculate the reward to give per enemy.
-        _enemyReward = Instance.EnemiesCount < 1 ? 0 : 0.5f / Instance.EnemiesCount;
         
         // Set the collider back to regular.
         col.isTrigger = false;

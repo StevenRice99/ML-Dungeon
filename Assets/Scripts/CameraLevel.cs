@@ -113,12 +113,17 @@ public class CameraLevel : CameraHandler
         y += h + x;
         float original = _level.WallPercent;
         float updated = GUI.HorizontalSlider(new(x, y, w, h), original, 0f, 1f);
-        if (Mathf.Approximately(original, updated))
+        if (!Mathf.Approximately(original, updated))
         {
-            return;
+            _level.WallPercent = updated;
+            _level.Agent.EndEpisode();
         }
         
-        _level.WallPercent = updated;
-        _level.Agent.EndEpisode();
+        // Show stats on the right.
+        float xr = Screen.width - x - w;
+        y = x;
+        GUI.Label(new(xr, y, w, h), $"Step: {_level.Agent.StepCount}");
+        y += h + x;
+        GUI.Label(new(xr, y, w, h), $"Score: {_level.Agent.GetCumulativeReward()}");
     }
 }
