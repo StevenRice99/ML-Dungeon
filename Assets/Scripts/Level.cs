@@ -66,7 +66,7 @@ public class Level : MonoBehaviour
     /// The number of enemies to attempt to spawn.
     /// </summary>
     [Tooltip("The number of enemies to attempt to spawn.")]
-    [Min(1)]
+    [Min(0)]
     [SerializeField]
     private int desiredEnemies = 3;
     
@@ -105,13 +105,6 @@ public class Level : MonoBehaviour
     [Tooltip("The prefab to use for the enemy. These spawn over floors, meaning their space is traversable.")]
     [SerializeField]
     private Enemy enemyPrefab;
-    
-    /// <summary>
-    /// The prefab for the objective coin. This space is traversable.
-    /// </summary>
-    [Tooltip("The prefab for the objective coin. This space is traversable.")]
-    [SerializeField]
-    private GameObject coinPrefab;
     
     /// <summary>
     /// The prefab for the weapon pickup. These spaces are traversable.
@@ -153,12 +146,6 @@ public class Level : MonoBehaviour
     /// </summary>
     [NonSerialized]
     public GameObject Weapon;
-    
-    /// <summary>
-    /// The end-of-level coin.
-    /// </summary>
-    [NonSerialized]
-    public GameObject End;
     
     /// <summary>
     /// The <see cref="Player"/>.
@@ -221,6 +208,9 @@ public class Level : MonoBehaviour
         {
             enemies.Add(PositionToIndex(enemy.transform.position));
         }
+
+        int a = _map.GetLength(0);
+        int b = _map.GetLength(1);
         
         for (int x = 0; x < length; x++)
         {
@@ -230,7 +220,7 @@ public class Level : MonoBehaviour
                 int2 real = new(coordinates.x - distance + x, coordinates.y - distance + y);
                 
                 // Check if the calculated global coordinates are within bounds.
-                if (real.x >= 0 && real.x < size && real.y >= 0 && real.y < size)
+                if (real.x >= 0 && real.x < a && real.y >= 0 && real.y < b)
                 {
                     localMap[x, y] = enemies.Contains(real) ? 0f : _map[real.x, real.y] ? 0.5f : 1f;
                 }
@@ -333,17 +323,17 @@ public class Level : MonoBehaviour
         };
         
         int startIndex = Random.Range(0, 4);
-        int endIndex = Random.Range(0, 4);
-        while (endIndex == startIndex)
+        int weaponIndex = Random.Range(0, 4);
+        while (weaponIndex == startIndex)
         {
-            endIndex = Random.Range(0, 4);
+            weaponIndex = Random.Range(0, 4);
         }
         
         Vector2Int startPos = corners[startIndex];
-        Vector2Int endPos = corners[endIndex];
+        Vector2Int weaponPos = corners[weaponIndex];
         
         level[startPos.x, startPos.y] = LevelParts.Start;
-        level[endPos.x, endPos.y] = LevelParts.End;
+        level[weaponPos.x, weaponPos.y] = LevelParts.Weapon;
         
         // Place walls ensuring full connectivity.
         int totalCells = size * size;
@@ -363,23 +353,24 @@ public class Level : MonoBehaviour
                 int ry = Random.Range(0, size);
                 
                 // Only place walls on empty floors.
-                if (level[rx, ry] == LevelParts.Floor)
+                if (level[rx, ry] != LevelParts.Floor)
                 {
-                    level[rx, ry] = LevelParts.Wall;
-                    currentTraversable--;
-                
-                    // If the level is still fully connected, keep the wall.
-                    if (IsConnected(level, startPos, currentTraversable))
-                    {
-                        wallsPlaced++;
-                    }
-                    else
-                    {
-                        // Revert the wall if it breaks the path.
-                        level[rx, ry] = LevelParts.Floor;
-                        currentTraversable++;
-                    }
+                    continue;
                 }
+                
+                level[rx, ry] = LevelParts.Wall;
+                currentTraversable--;
+                
+                // If the level is still fully connected, keep the wall.
+                if (IsConnected(level, startPos, currentTraversable))
+                {
+                    wallsPlaced++;
+                    continue;
+                }
+                
+                // Revert the wall if it breaks the path.
+                level[rx, ry] = LevelParts.Floor;
+                currentTraversable++;
             }
         }
         
@@ -442,15 +433,6 @@ public class Level : MonoBehaviour
             level[pos.x, pos.y] = LevelParts.Enemy;
         }
         
-        // Place the weapon pickup.
-        List<Vector2Int> remainingFloors = new();
-        for (int i = maxEnemies; i < floorDistances.Count; i++)
-        {
-            remainingFloors.Add(floorDistances[i].Key);
-        }
-        
-        Vector2Int weapon = remainingFloors[Random.Range(0, remainingFloors.Count)];
-        level[weapon.x, weapon.y] = LevelParts.Weapon;
         return level;
     }
     
@@ -545,12 +527,6 @@ public class Level : MonoBehaviour
             enemy.gameObject.SetActive(false);
         }
         
-        // Hide interactable items.
-        if (End)
-        {
-            End?.SetActive(false);
-        }
-        
         if (Weapon)
         {
             Weapon.SetActive(false);
@@ -569,7 +545,6 @@ public class Level : MonoBehaviour
                     case LevelParts.Floor:
                     case LevelParts.Enemy:
                     case LevelParts.Start:
-                    case LevelParts.End:
                     case LevelParts.Weapon:
                         InstantiateFixed(floorPrefabs[Random.Range(0, floorPrefabs.Length)], i, j, t, p, shift, _floors, _floorsExcess);
                         break;
@@ -619,17 +594,6 @@ public class Level : MonoBehaviour
                         {
                             Agent.body.position = position;
                             Agent.body.rotation = orientation;
-                        }
-                        break;
-                    case LevelParts.End:
-                        if (End)
-                        {
-                            End.transform.position = IndexToPosition(i, j, p, shift);
-                            End.SetActive(true);
-                        }
-                        else
-                        {
-                            End = InstantiatePiece(coinPrefab, i, j, t, p, shift);
                         }
                         break;
                     case LevelParts.Weapon:
@@ -701,9 +665,9 @@ public class Level : MonoBehaviour
     /// <param name="cache">The cache to add this to.</param>
     /// <param name="inactive">The inactive objects we can pull from to reuse.</param>
     /// <returns>The spawned instance.</returns>
-    private GameObject InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null, List<GameObject> inactive = null)
+    private void InstantiatePiece(GameObject prefab, int i, int j, Transform t, Vector3 p, float shift, List<GameObject> cache = null, List<GameObject> inactive = null)
     {
-        return InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.identity, t, cache, inactive);
+        InstantiatePiece(prefab, IndexToPosition(i, j, p, shift), Quaternion.identity, t, cache, inactive);
     }
     
     /// <summary>
@@ -877,11 +841,6 @@ public class Level : MonoBehaviour
         /// Where the player spawns.
         /// </summary>
         Start = 2,
-        
-        /// <summary>
-        /// Where the coin to end the level is placed.
-        /// </summary>
-        End = 3,
         
         /// <summary>
         /// Where the weapon pickup is placed.

@@ -181,6 +181,11 @@ public class Player : Agent
     private float _elapsed;
     
     /// <summary>
+    /// The per-enemy reward amount to give.
+    /// </summary>
+    private float _enemyReward;
+    
+    /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
     /// </summary>
     private void OnValidate()
@@ -293,7 +298,7 @@ public class Player : Agent
         }
         
         Parameters.BrainParameters.ActionSpec = spec;
-        Parameters.BrainParameters.VectorObservationSize = 12;
+        Parameters.BrainParameters.VectorObservationSize = 10;
         Parameters.BrainParameters.NumStackedVectorObservations = 1;
         Parameters.UseChildSensors = true;
         Parameters.UseChildActuators = false;
@@ -392,14 +397,18 @@ public class Player : Agent
         // The weapon pickup uses the "Respawn" tag.
         if (other.CompareTag("Respawn"))
         {
+            // If there are no enemies in the level, the weapon's pickup gives the full reward.
+            if (Instance.EnemiesCount < 1)
+            {
+                SetReward(1f);
+                CustomEndEpisode(false);
+                return;
+            }
+            
+            // Get a partial reward for reaching the weapon pickup.
             if (!_hasWeapon)
             {
-                // Get a partial reward if we got this when there are enemies.
-                if (Instance.EnemiesCount > 0)
-                {
-                    SetReward(0.5f);
-                }
-                
+                SetReward(0.5f);
                 _hasWeapon = true;
                 weapon?.SetActive(true);
             }
@@ -407,31 +416,33 @@ public class Player : Agent
             return;
         }
         
-        // The end-level coin uses the "Finish" tag. There must be no enemies left to finish the level.
-        if (Instance.EnemiesCount < 1 && other.CompareTag("Finish"))
-        {
-            SetReward(1f);
-            CustomEndEpisode(false);
-            return;
-        }
-        
         // The only other targets for us are enemies.
-        if (!other.TryGetComponent(out Enemy enemy))
+        if (!other.TryGetComponent(out Enemy enemy) || !Instance.EnemiesActive.Contains(enemy))
         {
             return;
         }
         
-        // If we have the weapon, eliminate enemies.
-        if (_hasWeapon)
+        // If we don't have the weapon, the agent lost, so end the episode.
+        if (!_hasWeapon)
         {
-            animator.Play(Attack);
-            Instance.EliminateEnemy(enemy);
+            CustomEndEpisode(true);
             return;
         }
         
-        // Otherwise, give the losing penalty and end the episode.
-        SetReward(0);
-        CustomEndEpisode(true);
+        // Otherwise, eliminate the enemy.
+        animator.Play(Attack);
+        Instance.EliminateEnemy(enemy);
+        
+        // Give a partial reward for eliminating one.
+        if (Instance.EnemiesCount >= 1)
+        {
+            AddReward(_enemyReward);
+            return;
+        }
+        
+        // If this was the last enemy, give the maximum reward and end the episode.
+        SetReward(1f);
+        CustomEndEpisode(false);
     }
     
     /// <summary>
@@ -443,23 +454,13 @@ public class Player : Agent
         if (failure)
         {
             // Figure out what we were trying to move in relation to, and whether or not it was the goal to determine partial rewards.
-            Vector3 goal;
-            float multiplier;
-            if (_hasWeapon || Instance.EnemiesCount < 0)
-            {
-                goal = Instance.End.transform.position;
-                multiplier = 0.75f;
-            }
-            else
-            {
-                goal = Instance.Weapon.transform.position;
-                multiplier = 0.5f;
-            }
-            
             // Calculate the Euclidean distance between the two vectors.
             // Normalize the distance and invert it for a "closeness" score. The maximum possible distance is the square root of two, hardcoded as we know this.
             // Clamp the result between 0 and 1 to prevent floating-point inaccuracies
-            SetReward(Mathf.Clamp01(1f - Vector2.Distance(Instance.PositionToPercentage(transform.position), Instance.PositionToPercentage(goal)) / 1.41421356f) * multiplier);
+            if (!_hasWeapon)
+            {
+                SetReward(Mathf.Clamp01(1f - Vector2.Distance(Instance.PositionToPercentage(transform.position), Instance.PositionToPercentage(Instance.Weapon.transform.position)) / 1.41421356f) * 0.5f);
+            }
             
             // Handle if recording.
             if (_recording)
@@ -522,9 +523,6 @@ public class Player : Agent
         _previous = Instance.PositionToPercentage(transform.position);
         sensor.AddObservation(_previous);
         
-        // Get the goal's position.
-        sensor.AddObservation(Instance.PositionToPercentage(Instance.End.transform.position));
-        
         // To reduce the number of observations, use the weapon indication in two ways.
         // When we don't have the weapon, give the relative coordinates of the weapon pickup.
         // Otherwise, pass [-1, -1] when we do have the weapon.
@@ -577,18 +575,8 @@ public class Player : Agent
         Vector2 p2 = new(p.x, p.z);
         NavMeshPath path = new();
         
-        // If all enemies have been eliminated, we can win the level, so navigate there.
-        if (Instance.EnemiesCount < 1)
-        {
-            if (_recording)
-            {
-                Time.timeScale = _recording.AutoScale;
-            }
-            
-            NavMesh.CalculatePath(p, Instance.End.transform.position, NavMesh.AllAreas, path);
-        }
-        // Otherwise, there are enemies, so if we have a weapon, navigate to the nearest one to eliminate them.
-        else if (_hasWeapon)
+        // If there are enemies, so if we have a weapon, navigate to the nearest one to eliminate them.
+        if (_hasWeapon)
         {
             if (_recording)
             {
@@ -740,6 +728,9 @@ public class Player : Agent
         // Reset timeout values.
         _elapsed = 0;
         _lastPosition = new(p.x, p.z);
+        
+        // Calculate the reward to give per enemy.
+        _enemyReward = Instance.EnemiesCount < 1 ? 0 : 0.5f / Instance.EnemiesCount;
         
         // Set the collider back to regular.
         col.isTrigger = false;
