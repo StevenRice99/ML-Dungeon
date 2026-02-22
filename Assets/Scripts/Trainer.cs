@@ -61,7 +61,7 @@ public class Trainer : MonoBehaviour
     /// The minimum amount of enemies that can be spawned in any scenario.
     /// </summary>
     [field: Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
-    [field: Min(0)]
+    [field: Min(1)]
     [field: SerializeField]
     public int MinEnemies { get; private set; } = 1;
     
@@ -69,7 +69,7 @@ public class Trainer : MonoBehaviour
     /// The maximum amount of enemies that can be spawned in any scenario.
     /// </summary>
     [field: Tooltip("The maximum amount of enemies that can be spawned in any scenario.")]
-    [field: Min(0)]
+    [field: Min(1)]
     [field: SerializeField]
     public int MaxEnemies { get; private set; } = 5;
     

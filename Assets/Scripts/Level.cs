@@ -66,10 +66,10 @@ public class Level : MonoBehaviour
     /// The number of enemies to attempt to spawn.
     /// </summary>
     [Tooltip("The number of enemies to attempt to spawn.")]
-    [Min(0)]
+    [Min(1)]
     [SerializeField]
     private int desiredEnemies = 3;
-
+    
     /// <summary>
     /// The spacing of pieces of the level.
     /// </summary>
