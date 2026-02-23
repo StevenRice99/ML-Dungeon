@@ -142,7 +142,7 @@ checkpoint_settings:
   force: false
   train_model: false
   inference: false
-  results_dir: results
+  results_dir: Results
 torch_settings:
   device: null
 debug: false
