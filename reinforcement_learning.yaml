@@ -28,7 +28,7 @@ behaviors:
     keep_checkpoints: 5
     checkpoint_interval: 50000
     threaded: false
-    init_path: Results/pretraining/DungeonPlayer/DungeonPlayer.pt
+    init_path: Results/dungeon_player_pretraining/DungeonPlayer/DungeonPlayer.pt
     reward_signals:
       extrinsic:
         strength: 1.0
