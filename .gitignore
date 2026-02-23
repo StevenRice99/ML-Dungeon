@@ -81,3 +81,6 @@ crashlytics-build.properties
 # Python virtual environments
 venv
 .venv
+
+# Demonstrations folder due to its size and ease to reproduce if needed
+Demonstrations
