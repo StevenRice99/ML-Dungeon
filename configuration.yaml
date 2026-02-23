@@ -32,7 +32,7 @@ behaviors:
     behavioral_cloning:
       demo_path: Demonstrations/
       strength: 0.5
-      steps: 150000
+      steps: 500000
       batch_size: 512
       num_epoch: 3
       samples_per_update: 0
@@ -46,7 +46,7 @@ behaviors:
         encoding_size: 256
         learning_rate: 3.0e-4
       gail:
-        strength: 0.01
+        strength: 0.1
         gamma: 0.99
         encoding_size: 128
         demo_path: Demonstrations/
@@ -82,7 +82,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 10.0
       - name: Medium
         completion_criteria:
@@ -90,7 +90,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 20.0
       - name: Hard
         value: 30.0
@@ -102,7 +102,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 0.0
       - name: Medium
         completion_criteria:
@@ -110,7 +110,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 0.1
       - name: Hard
         value: 0.2
@@ -122,7 +122,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 0.0
       - name: Medium
         completion_criteria:
@@ -130,7 +130,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 0.5
+          threshold: 2.0
         value: 1.0
       - name: Hard
         value: 3.0
