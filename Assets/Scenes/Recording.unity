@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Recording
   autoScale: 20
   <ManualScale>k__BackingField: 20
-  number: 10000
+  number: 2500
   <MinSize>k__BackingField: 10
   <MaxSize>k__BackingField: 30
   <MinWalls>k__BackingField: 0
