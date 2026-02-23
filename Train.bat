@@ -1,2 +1,2 @@
 call .venv\Scripts\activate
-mlagents-learn configuration.yaml
+mlagents-learn reinforcement_learning.yaml
