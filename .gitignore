@@ -89,5 +89,5 @@ venv
 *.pt
 
 # Don't need the ML-Agents files in the "Assets" folder.
-/[Aa]ssets/[Mm][Ll]-Aa]gents
-/[Aa]ssets/[Mm][Ll]-Aa]gents.meta
+/[Aa]ssets/[Mm][Ll]-[Aa]gents
+/[Aa]ssets/[Mm][Ll]-[Aa]gents.meta
