@@ -72,7 +72,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 0.8
         value: 10.0
       - name: Medium
         completion_criteria:
@@ -80,7 +80,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 1.5
         value: 20.0
       - name: Hard
         value: 30.0
@@ -92,7 +92,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 0.8
         value: 0.0
       - name: Medium
         completion_criteria:
@@ -100,7 +100,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 1.5
         value: 0.1
       - name: Hard
         value: 0.2
@@ -112,7 +112,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 0.8
         value: 0.0
       - name: Medium
         completion_criteria:
@@ -120,7 +120,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 2.0
+          threshold: 1.5
         value: 1.0
       - name: Hard
         value: 3.0
