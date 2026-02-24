@@ -5,7 +5,7 @@ behaviors:
     hyperparameters:
       batch_size: 1024
       buffer_size: 10240
-      learning_rate: 3.0e-4
+      learning_rate: 3.0e-4  # Standard learning rate for training from scratch
       learning_rate_schedule: linear
       beta: 5.0e-3
       beta_schedule: constant
@@ -19,13 +19,14 @@ behaviors:
       normalize: false
       hidden_units: 128
       num_layers: 2
-    max_steps: 1.0e6
+      # Memory block removed
+    max_steps: 1000000
     time_horizon: 64
     summary_freq: 10000
     keep_checkpoints: 5
     checkpoint_interval: 50000
     threaded: false
-    init_path: Results/dungeon_player_pretraining/DungeonPlayer.pt 
+    init_path: null
     reward_signals:
       extrinsic:
         strength: 1.0
@@ -35,14 +36,6 @@ behaviors:
         gamma: 0.99
         encoding_size: 256
         learning_rate: 3.0e-4
-      gail:
-        strength: 0.1
-        gamma: 0.99
-        encoding_size: 128
-        demo_path: Demonstrations/
-        learning_rate: 3.0e-4
-        use_actions: false
-        use_vail: false
 env_settings:
   env_path: null
   env_args: null
@@ -125,7 +118,7 @@ environment_parameters:
       - name: Hard
         value: 3.0
 checkpoint_settings:
-  run_id: dungeon_player_rl_finetune
+  run_id: dungeon_player_curriculum
   initialize_from: null
   load_model: false
   resume: false
