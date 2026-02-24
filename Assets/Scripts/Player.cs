@@ -346,7 +346,7 @@ public class Player : Agent
         body.linearVelocity = _velocity3;
         
         // If this is not in inference mode, add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
-        if (!Parameters.IsInHeuristicMode() && (!Academy.IsInitialized || Academy.Instance.IsCommunicatorOn))
+        if (!Parameters.IsInHeuristicMode() && (!Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn))
         {
             return;
         }
