@@ -1,0 +1,138 @@
+default_settings: null
+behaviors:
+  DungeonPlayer:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 1024
+      buffer_size: 10240
+      learning_rate: 3.0e-4
+      learning_rate_schedule: linear
+      beta: 5.0e-3
+      beta_schedule: constant
+      epsilon: 0.2
+      epsilon_schedule: linear
+      lambd: 0.95
+      num_epoch: 3
+      shared_critic: False
+    network_settings:
+      vis_encode_type: match3
+      normalize: false
+      hidden_units: 128
+      num_layers: 2
+    max_steps: 1.0e6
+    time_horizon: 64
+    summary_freq: 10000
+    keep_checkpoints: 5
+    checkpoint_interval: 50000
+    threaded: false
+    init_path: Results/dungeon_player_pretraining/DungeonPlayer.pt 
+    reward_signals:
+      extrinsic:
+        strength: 1.0
+        gamma: 0.99
+      curiosity:
+        strength: 0.02
+        gamma: 0.99
+        encoding_size: 256
+        learning_rate: 3.0e-4
+      gail:
+        strength: 0.1
+        gamma: 0.99
+        encoding_size: 128
+        demo_path: Demonstrations/
+        learning_rate: 3.0e-4
+        use_actions: false
+        use_vail: false
+env_settings:
+  env_path: null
+  env_args: null
+  base_port: 5005
+  num_envs: 1
+  num_areas: 1
+  timeout_wait: 60
+  seed: -1
+  max_lifetime_restarts: 10
+  restarts_rate_limit_n: 1
+  restarts_rate_limit_period_s: 60
+engine_settings:
+  width: 84
+  height: 84
+  quality_level: 5
+  time_scale: 20
+  target_frame_rate: -1
+  capture_frame_rate: 60
+  no_graphics: true
+  no_graphics_monitor: false
+environment_parameters:
+  size:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 10.0
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 20.0
+      - name: Hard
+        value: 30.0
+  walls:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 0.0
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 0.1
+      - name: Hard
+        value: 0.2
+  enemies:
+    curriculum:
+      - name: Easy
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 0.0
+      - name: Medium
+        completion_criteria:
+          measure: reward
+          behavior: DungeonPlayer
+          signal_smoothing: true
+          min_lesson_length: 100
+          threshold: 2.0
+        value: 1.0
+      - name: Hard
+        value: 3.0
+checkpoint_settings:
+  run_id: dungeon_player_fine_tune_curriculum
+  initialize_from: null
+  load_model: false
+  resume: false
+  force: false
+  train_model: false
+  inference: false
+  results_dir: Results
+torch_settings:
+  device: null
+debug: false

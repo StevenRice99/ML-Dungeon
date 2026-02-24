@@ -41,28 +41,12 @@ public class Trainer : MonoBehaviour
     public int MaxSize { get; private set; } = 30;
     
     /// <summary>
-    /// The minimum wall percentage that can be spawned in any scenario.
-    /// </summary>
-    [field: Tooltip("The minimum wall percentage that can be spawned in any scenario.")]
-    [field: Range(0f, 1f)]
-    [field: SerializeField]
-    public float MinWalls { get; private set; } = 0.1f;
-    
-    /// <summary>
     /// The maximum wall percentage that can be spawned in any scenario.
     /// </summary>
     [field: Tooltip("The maximum wall percentage that can be spawned in any scenario.")]
     [field: Range(0f, 1f)]
     [field: SerializeField]
     public float MaxWalls { get; private set; } = 0.2f;
-    
-    /// <summary>
-    /// The minimum amount of enemies that can be spawned in any scenario.
-    /// </summary>
-    [field: Tooltip("The minimum amount of enemies that can be spawned in any scenario.")]
-    [field: Min(0)]
-    [field: SerializeField]
-    public int MinEnemies { get; private set; } = 1;
     
     /// <summary>
     /// The maximum amount of enemies that can be spawned in any scenario.
@@ -80,16 +64,6 @@ public class Trainer : MonoBehaviour
         if (MinSize > MaxSize)
         {
             (MaxSize, MinSize) = (MinSize, MaxSize);
-        }
-        
-        if (MinWalls > MaxWalls)
-        {
-            (MaxWalls, MinWalls) = (MinWalls, MaxWalls);
-        }
-        
-        if (MinEnemies > MaxEnemies)
-        {
-            (MaxEnemies, MinEnemies) = (MinEnemies, MaxEnemies);
         }
     }
     
