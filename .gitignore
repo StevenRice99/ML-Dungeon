@@ -84,3 +84,6 @@ venv
 
 # Demonstrations folder due to its size and ease to reproduce if needed
 Demonstrations
+
+# PyTorch files are typically too large.
+*.pt
