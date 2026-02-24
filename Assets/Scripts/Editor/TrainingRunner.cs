@@ -50,25 +50,38 @@ public static class TrainingRunner
     }
     
     /// <summary>
+    /// Monitor the learning in Tensorboard.
+    /// </summary>
+    [MenuItem("ML-Dungeon/Tensorboard", false, 14)]
+    public static void Tensorboard()
+    {
+        RunScript("Monitor.bat");
+    }
+    
+    /// <summary>
+    /// Install a Python environment.
+    /// </summary>
+    [MenuItem("ML-Dungeon/Install", false, 25)]
+    public static void Install()
+    {
+        RunScript("Install.bat");
+    }
+    
+    /// <summary>
+    /// Activate the Python environment.
+    /// </summary>
+    [MenuItem("ML-Dungeon/Activate", false, 26)]
+    public static void Activate()
+    {
+        RunScript("Activate.bat");
+    }
+    
+    /// <summary>
     /// Run a script.
     /// </summary>
     /// <param name="name">The name of the script.</param>
-    /// <param name="delay">The seconds to wait before starting to play. Set to zero or less for no launching of Unity.</param>
-    /// <param name="scene">The scene to load.</param>
-    private static async void RunScript([NotNull] string name, float delay = 5f, [NotNull] string scene = "Training")
+    private static void RunScript([NotNull] string name)
     {
-        if (delay > 0)
-        {
-            // Exit play mode to then re-establish it after.
-            if (EditorApplication.isPlaying)
-            {
-                EditorApplication.isPlaying = false;
-            }
-            
-            // Ensure the right scene is loaded
-            LoadScene(scene);
-        }
-        
         // Get the directory.
         string directory = Path.GetDirectoryName(Application.dataPath);
         if (directory == null)
@@ -106,44 +119,6 @@ public static class TrainingRunner
         catch (Exception e)
         {
             Debug.LogError($"Failed to execute \"{file}\": {e.Message}");
-            return;
-        }
-        
-        // Try to play the game.
-        if (delay <= 0)
-        {
-            return;
-        }
-        
-        await Awaitable.WaitForSecondsAsync(delay);
-        EditorApplication.isPlaying = true;
-    }
-    
-    /// <summary>
-    /// Load a scene.
-    /// </summary>
-    /// <param name="name">The scene to load.</param>
-    private static void LoadScene([NotNull] string name)
-    {
-        // Find all scene assets in the project.
-        foreach (string guid in AssetDatabase.FindAssets("t:Scene"))
-        {
-            // Convert the GUID to an actual file path.
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            
-            // Verify it's an exact name match.
-            if (Path.GetFileNameWithoutExtension(path) != name)
-            {
-                continue;
-            }
-            
-            // Prompt the user to save any unsaved work in the current scene.
-            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-            {
-                EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-            }
-            
-            return;
         }
     }
 }
