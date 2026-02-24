@@ -19,16 +19,13 @@ behaviors:
       normalize: false
       hidden_units: 128
       num_layers: 2
-      memory:
-        sequence_length: 64
-        memory_size: 256
     max_steps: 1.0e6
     time_horizon: 64
     summary_freq: 10000
     keep_checkpoints: 5
     checkpoint_interval: 50000
     threaded: false
-    init_path: Results/dungeon_player_pretraining/DungeonPlayer/DungeonPlayer.pt
+    init_path: Results/dungeon_player_pretraining/DungeonPlayer/DungeonPlayer.pt 
     reward_signals:
       extrinsic:
         strength: 1.0
@@ -127,3 +124,15 @@ environment_parameters:
         value: 1.0
       - name: Hard
         value: 3.0
+checkpoint_settings:
+  run_id: dungeon_player_rl_finetune
+  initialize_from: null
+  load_model: false
+  resume: false
+  force: false
+  train_model: false
+  inference: false
+  results_dir: Results
+torch_settings:
+  device: null
+debug: false
