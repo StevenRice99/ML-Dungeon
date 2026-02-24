@@ -60,6 +60,13 @@ public class Player : Agent
     private float penalty = -0.0001f;
     
     /// <summary>
+    /// The maximum number of steps allowed to be performed between goals before being considered a failure.
+    /// </summary>
+    [Tooltip("The maximum number of steps allowed to be performed between goals before being considered a failure.")]
+    [SerializeField]
+    private int maxSteps = 500;
+    
+    /// <summary>
     /// The weapon visual.
     /// </summary>
     [Header("Components")]
@@ -186,6 +193,11 @@ public class Player : Agent
     /// The elapsed timeout time.
     /// </summary>
     private float _elapsed;
+    
+    /// <summary>
+    /// The current step since accomplishing something.
+    /// </summary>
+    private int _step;
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -327,36 +339,42 @@ public class Player : Agent
     /// </summary>
     private void FixedUpdate()
     {
-        // If this is not in inference mode, add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
-        if (Parameters.IsInHeuristicMode() || !Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn)
-        {
-            // Check our tile.
-            Vector3 p = transform.position;
-            Vector2 p2 = new(p.x, p.z);
-            
-            // If the positions are the same, step the time, stopping if we have been in the same spot for too long.
-            if (Vector2.Distance(p2, _lastPosition) < distance)
-            {
-                _elapsed += Time.fixedDeltaTime;
-                if (_elapsed >= seconds)
-                {
-                    CustomEndEpisode(true);
-                    return;
-                }
-            }
-            else
-            {
-                // Otherwise, reset the timeout.
-                _lastPosition = p2;
-                _elapsed = 0;
-            }
-        }
-        
         AddReward(penalty);
         RequestDecision();
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
         body.linearVelocity = _velocity3;
+        
+        // If this is not in inference mode, add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
+        if (!Parameters.IsInHeuristicMode() && (!Academy.IsInitialized || Academy.Instance.IsCommunicatorOn))
+        {
+            return;
+        }
+        
+        // See if we have hit the maximum number of steps.
+        if (++_step >= maxSteps)
+        {
+            CustomEndEpisode(true);
+            return;
+        }
+        
+        // Check our tile.
+        Vector3 p = transform.position;
+        Vector2 p2 = new(p.x, p.z);
+        
+        // If the positions are the same, step the time, stopping if we have been in the same spot for too long.
+        if (Vector2.Distance(p2, _lastPosition) >= distance)
+        {
+            _lastPosition = p2;
+            _elapsed = 0;
+            return;
+        }
+        
+        _elapsed += Time.fixedDeltaTime;
+        if (_elapsed >= seconds)
+        {
+            CustomEndEpisode(true);
+        }
     }
     
     /// <summary>
@@ -388,6 +406,7 @@ public class Player : Agent
                 _hasWeapon = true;
                 weapon?.SetActive(true);
                 SetReward(1f);
+                _step = 0;
             }
             
             // If there are no enemies in the level, end it.
@@ -417,6 +436,7 @@ public class Player : Agent
         animator.Play(Attack);
         Instance.EliminateEnemy(enemy);
         SetReward(1f);
+        _step = 0;
         
         // If this was the last enemy, end the episode.
         if (Instance.EnemiesCount < 1)
@@ -703,6 +723,7 @@ public class Player : Agent
         // Reset timeout values.
         _elapsed = 0;
         _lastPosition = new(p.x, p.z);
+        _step = 0;
         
         // Set the collider back to regular.
         col.isTrigger = false;
