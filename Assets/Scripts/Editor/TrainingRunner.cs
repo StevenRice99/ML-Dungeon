@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -56,6 +55,7 @@ public static class TrainingRunner
     public static void Tensorboard()
     {
         RunScript("Monitor.bat");
+        Application.OpenURL("http://localhost:6006");
     }
     
     /// <summary>
