@@ -2,6 +2,7 @@
 
 Teaching an agent to navigate randomly generated and randomly-sized dungeons with [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"). See a [web demo](https://stevenrice.ca/ml-dungeon "ML-Dungeon").
 
+- [Purpose](#purpose "Purpose")
 - [Game Overview](#game-overview "Game Overview")
 - [Agent Design](#agent-design "Agent Design")
 - [Agent Rewards](#agent-rewards "Agent Rewards")
@@ -13,8 +14,12 @@ Teaching an agent to navigate randomly generated and randomly-sized dungeons wit
 - [Running](#running "Running")
   - [Unity Editor](#unity-editor "Unity Editor")
     - [Run Training](#run-training "Run Training")
-      - [Helper Files](#helper-files "Helper Files")
+      - [Helper Functions](#helper-functions "Helper Functions")
 - [Resources](#resources "Resources")
+
+## Purpose
+
+The purpose is this project is for use as a learning resources for [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"), highlighting how different methods can be applied to try and overcome a complex environment. As such, many of the final trained agents in their current states are not very effective.
 
 ## Game Overview
 
@@ -100,11 +105,19 @@ To run the project in the Unity editor, there are several scenes:
 
 #### Run Training
 
-To train the agent, you can either read the [Unity ML-Agents documentation](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents") to learn how to install and run [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"), or use the provided [helper files](#helper-files "Helper Files") to train the agent.
+To train the agent, you can either read the [Unity ML-Agents documentation](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents") to learn how to install and run [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"), or use the provided [helper functions](#helper-functions "Helper Functions") to train the agent.
 
-##### Helper Files
+##### Helper Functions
 
-The helper files have been made for Windows and you must [install uv](https://docs.astral.sh/uv/#installation "UV Installation"). Once installed, open your terminal in root of your downloaded Unity project and run `Install.bat`. Once ready to train your agent, run `Train.bat`. Once done, copy the created neural network into your `Assets` folder, and assign it to the `Model` field of the `Behavior Parameters` component on the `PlayerTrained` prefab.
+The helper files have been made for Windows and you must [install uv](https://docs.astral.sh/uv/#installation "UV Installation"). One installed, from the top menu of the Unity editor, you can select `ML-Dungeon` followed by the desired command to run.
+
+- `Behavioral Cloning` - This will train a model purely on the captured demonstrations.
+- `Fine-Tuned` - After running the behavioral cloning, this will then train the model further using reinforcement learning, directly jumping to the "Hard" configuration of the [curriculum learning](#curriculum-learning "Curriculum Learning").
+- `Curriculum Learning` - This will train a reinforcement learning model from scratch using [curriculum learning](#curriculum-learning "Curriculum Learning").
+- `Fine-Tuned and Curriculum Learning` - After running the behavioral cloning, this will then train the model further using reinforcement learning using [curriculum learning](#curriculum-learning "Curriculum Learning").
+- `TensorBoard` - This will open your browser to see the [TensorBoard](https://www.tensorflow.org/tensorboard "TensorBoard") logs of the training of all models.
+- `Install` - If you have [uv](https://docs.astral.sh/uv "uv") installed for Python, this will set up your environment for running all other commands.
+- `Activate` - This will open a terminal in your [uv](https://docs.astral.sh/uv "uv") Python virtual environment for this project, allowing you to run other commands.
 
 ## Resources
 

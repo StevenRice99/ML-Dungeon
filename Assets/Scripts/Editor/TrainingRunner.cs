@@ -22,10 +22,10 @@ public static class TrainingRunner
     }
     
     /// <summary>
-    /// Run transfer learning.
+    /// Run fine-tuning.
     /// </summary>
-    [MenuItem("ML-Dungeon/Transfer Learning", false, 1)]
-    public static void TransferLearning()
+    [MenuItem("ML-Dungeon/Fine-Tuned", false, 1)]
+    public static void FineTuned()
     {
         RunScript("Tune.bat");
     }
@@ -40,19 +40,19 @@ public static class TrainingRunner
     }
     
     /// <summary>
-    /// Run transfer and curriculum learning.
+    /// Run fine-tuning and curriculum learning.
     /// </summary>
-    [MenuItem("ML-Dungeon/Transfer and Curriculum Learning", false, 3)]
-    public static void TransferCurriculumLearning()
+    [MenuItem("ML-Dungeon/Fine-Tuned and Curriculum Learning", false, 3)]
+    public static void FineTunedCurriculumLearning()
     {
         RunScript("Full.bat");
     }
     
     /// <summary>
-    /// Monitor the learning in Tensorboard.
+    /// Monitor the learning in TensorBoard.
     /// </summary>
-    [MenuItem("ML-Dungeon/Tensorboard", false, 14)]
-    public static void Tensorboard()
+    [MenuItem("ML-Dungeon/TensorBoard", false, 14)]
+    public static void TensorBoard()
     {
         RunScript("Monitor.bat");
         Application.OpenURL("http://localhost:6006");
