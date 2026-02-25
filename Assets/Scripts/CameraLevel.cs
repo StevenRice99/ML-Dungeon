@@ -1,4 +1,7 @@
-﻿using Unity.MLAgents;
+﻿using System.Linq;
+using Unity.InferenceEngine;
+using Unity.MLAgents;
+using Unity.MLAgents.Policies;
 using UnityEngine;
 
 /// <summary>
@@ -11,6 +14,13 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraLevel : CameraHandler
 {
+    /// <summary>
+    /// The models we can switch between.
+    /// </summary>
+    [Tooltip("The models we can switch between.")]
+    [SerializeField]
+    private ModelAsset[] models;
+    
     /// <summary>
     /// The <see cref="Level"/>.
     /// </summary>
@@ -33,6 +43,9 @@ public class CameraLevel : CameraHandler
         }
         
         _recording = FindAnyObjectByType<Recording>(FindObjectsInactive.Include);
+        
+        // Ensure no NULL models.
+        models = models.Where(x => x != null).ToArray();
     }
     
     /// <summary>
@@ -53,7 +66,7 @@ public class CameraLevel : CameraHandler
     private void OnGUI()
     {
         const float x = 10;
-        const float w = 150;
+        const float w = 175;
         const float h = 25;
         
         // If we are recording, add a discard button in case an error occurs.
@@ -74,6 +87,12 @@ public class CameraLevel : CameraHandler
         }
         
         float y = x;
+        if (GUI.Button(new(x, y, w, h), "Reset"))
+        {
+            _level.Agent.EndEpisode();
+        }
+        
+        y += h + x;
         if (GUI.Button(new(x, y, w, h), "Increase Size"))
         {
             _level.Size++;
@@ -119,9 +138,72 @@ public class CameraLevel : CameraHandler
             _level.Agent.EndEpisode();
         }
         
-        // Show stats on the right.
+        // Reset the coordinates for the right side of the screen.
         float xr = Screen.width - x - w;
         y = x;
+        
+        // Allow us to choose the execution mode if any models.
+        if (models.Length > 0 && (!Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn))
+        {
+            // Handle based on if we are currently using a model or not.
+            bool heuristic = _level.Agent.Parameters.IsInHeuristicMode();
+            if (heuristic)
+            {
+                // Indicate we are in heuristic mode.
+                GUI.Label(new(xr, y, w, h), "Heuristic");
+                y += h + x;
+                
+                // Give options to switch to all the other models.
+                foreach (ModelAsset model in models)
+                {
+                    if (GUI.Button(new(xr, y, w, h), model.name))
+                    {
+                        _level.Agent.Parameters.Model = model;
+                        _level.Agent.Parameters.BehaviorType = BehaviorType.InferenceOnly;
+                    }
+                    
+                    y += h + x;
+                }
+            }
+            else
+            {
+                // Display the name of the current model.
+                ModelAsset model = _level.Agent.Parameters.Model;
+                if (model != null)
+                {
+                    GUI.Label(new(xr, y, w, h), model.name);
+                    y += h + x;
+                }
+                
+                // Display all other models which can be switched to.
+                foreach (ModelAsset other in models)
+                {
+                    if (model == other)
+                    {
+                        continue;
+                    }
+                    
+                    if (GUI.Button(new(xr, y, w, h), other.name))
+                    {
+                        _level.Agent.Parameters.Model = other;
+                        _level.Agent.Parameters.BehaviorType = BehaviorType.InferenceOnly;
+                    }
+                    
+                    y += h + x;
+                }
+                
+                // Display the option to switch to heuristic mode.
+                if (GUI.Button(new(xr, y, w, h), "Heuristic"))
+                {
+                    _level.Agent.Parameters.Model = null;
+                    _level.Agent.Parameters.BehaviorType = BehaviorType.HeuristicOnly;
+                }
+                
+                y += h + x;
+            }
+        }
+        
+        // Show stats
         GUI.Label(new(xr, y, w, h), $"Step: {_level.Agent.StepCount}");
         y += h + x;
         GUI.Label(new(xr, y, w, h), $"Score: {_level.Agent.GetCumulativeReward()}");
