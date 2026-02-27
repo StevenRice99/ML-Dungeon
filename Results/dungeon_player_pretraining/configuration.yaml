@@ -76,7 +76,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 3789
+          seed: 4217
           value: 30.0
       name: size
       completion_criteria: null
@@ -85,7 +85,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 3790
+          seed: 4218
           value: 0.2
       name: walls
       completion_criteria: null
@@ -94,7 +94,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 3791
+          seed: 4219
           value: 3.0
       name: enemies
       completion_criteria: null

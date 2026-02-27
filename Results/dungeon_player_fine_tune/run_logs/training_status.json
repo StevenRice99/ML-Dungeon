@@ -11,58 +11,58 @@
     "DungeonPlayer": {
         "checkpoints": [
             {
-                "steps": 849977,
-                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-849977.onnx",
-                "reward": 1.0347908287817105,
-                "creation_time": 1772032130.0235474,
+                "steps": 2849963,
+                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2849963.onnx",
+                "reward": 0.43004994782677386,
+                "creation_time": 1772218814.4345925,
                 "auxillary_file_paths": [
-                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-849977.pt"
+                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2849963.pt"
                 ]
             },
             {
-                "steps": 899966,
-                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-899966.onnx",
-                "reward": 1.165588831735982,
-                "creation_time": 1772032210.9127164,
+                "steps": 2899961,
+                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2899961.onnx",
+                "reward": null,
+                "creation_time": 1772218885.190718,
                 "auxillary_file_paths": [
-                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-899966.pt"
+                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2899961.pt"
                 ]
             },
             {
-                "steps": 949943,
-                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-949943.onnx",
-                "reward": 0.15910000540316105,
-                "creation_time": 1772032292.7103798,
+                "steps": 2949956,
+                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2949956.onnx",
+                "reward": 0.00392631617815871,
+                "creation_time": 1772218952.5755577,
                 "auxillary_file_paths": [
-                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-949943.pt"
+                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2949956.pt"
                 ]
             },
             {
-                "steps": 999995,
-                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-999995.onnx",
-                "reward": 1.1511799342930318,
-                "creation_time": 1772032378.4986978,
+                "steps": 2999965,
+                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2999965.onnx",
+                "reward": -0.12277857672389862,
+                "creation_time": 1772219024.0030224,
                 "auxillary_file_paths": [
-                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-999995.pt"
+                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-2999965.pt"
                 ]
             },
             {
-                "steps": 1000059,
-                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-1000059.onnx",
-                "reward": 1.1511799342930318,
-                "creation_time": 1772032379.1028733,
+                "steps": 3000016,
+                "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-3000016.onnx",
+                "reward": -0.1179200048170363,
+                "creation_time": 1772219024.572748,
                 "auxillary_file_paths": [
-                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-1000059.pt"
+                    "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-3000016.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 1000059,
+            "steps": 3000016,
             "file_path": "Results\\dungeon_player_fine_tune\\DungeonPlayer.onnx",
-            "reward": 1.1511799342930318,
-            "creation_time": 1772032379.1028733,
+            "reward": -0.1179200048170363,
+            "creation_time": 1772219024.572748,
             "auxillary_file_paths": [
-                "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-1000059.pt"
+                "Results\\dungeon_player_fine_tune\\DungeonPlayer\\DungeonPlayer-3000016.pt"
             ]
         }
     },

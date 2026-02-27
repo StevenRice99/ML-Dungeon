@@ -67,7 +67,7 @@ behaviors:
     init_path: Results/dungeon_player_pretraining/DungeonPlayer.pt
     keep_checkpoints: 5
     even_checkpoints: false
-    max_steps: 1000000
+    max_steps: 3000000
     time_horizon: 64
     summary_freq: 10000
     threaded: false
@@ -99,7 +99,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 9473
+          seed: 9419
           value: 30.0
       name: size
       completion_criteria: null
@@ -108,7 +108,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 9474
+          seed: 9420
           value: 0.2
       name: walls
       completion_criteria: null
@@ -117,7 +117,7 @@ environment_parameters:
     - value:
         sampler_type: constant
         sampler_parameters:
-          seed: 9475
+          seed: 9421
           value: 3.0
       name: enemies
       completion_criteria: null
