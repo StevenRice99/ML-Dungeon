@@ -487,7 +487,8 @@ public class Player : Agent
             // Add a relative reward based on how close the agent got to their next objective.
             // If in opposite extremes, such as the player being at [0, 0] and the next objective being at [1, 1], this is zero reward.
             // Otherwise, if somehow, they were right on top of each other, which should never happen as otherwise it wouldn't be a failure to begin with, but this situation would give a reward of one.
-            // TODO - Implement.
+            // The maximum possible distance in a 1x1 grid is the diagonal length, being the square root of two.
+            AddReward(Mathf.Clamp01(1f - Vector2.Distance(self, objective) / 1.4142135623730950488f));
             
             // Handle if recording.
             if (_recording)
