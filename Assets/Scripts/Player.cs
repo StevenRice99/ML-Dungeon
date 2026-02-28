@@ -430,8 +430,16 @@ public class Player : Agent
             }
             else
             {
-                Vector3 objective3 = Instance.Weapon.transform.position;
-                objective = new(objective3.x, objective3.z);
+                GameObject w = Instance.Weapon;
+                if (w)
+                {
+                    Vector3 objective3 = Instance.Weapon.transform.position;
+                    objective = new(objective3.x, objective3.z);
+                }
+                else
+                {
+                    objective = self;
+                }
             }
             
             // Get the points as relative coordinates to the level, with each axis being from [0, 1].
