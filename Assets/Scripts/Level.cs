@@ -208,9 +208,19 @@ public class Level : MonoBehaviour
         {
             enemies.Add(PositionToIndex(enemy.transform.position));
         }
-
-        int a = _map.GetLength(0);
-        int b = _map.GetLength(1);
+        
+        int a;
+        int b;
+        if (_map != null)
+        {
+            a = _map.GetLength(0);
+            b = _map.GetLength(1);
+        }
+        else
+        {
+            a = 0;
+            b = 0;
+        }
         
         for (int x = 0; x < length; x++)
         {
@@ -222,7 +232,7 @@ public class Level : MonoBehaviour
                 // Check if the calculated global coordinates are within bounds.
                 if (real.x >= 0 && real.x < a && real.y >= 0 && real.y < b)
                 {
-                    localMap[x, y] = enemies.Contains(real) ? 0f : _map[real.x, real.y] ? 0.5f : 1f;
+                    localMap[x, y] = enemies.Contains(real) ? 0f : _map != null && _map[real.x, real.y] ? 0.5f : 1f;
                 }
                 else
                 {
