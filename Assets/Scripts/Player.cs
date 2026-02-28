@@ -57,14 +57,14 @@ public class Player : Agent
     /// </summary>
     [Tooltip("The penalty for movement cost.")]
     [SerializeField]
-    private float penalty = -0.0001f;
+    private float penalty = -0.001f;
     
     /// <summary>
-    /// The maximum number of steps allowed to be performed between goals before being considered a failure.
+    /// The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level.
     /// </summary>
-    [Tooltip("The maximum number of steps allowed to be performed between goals before being considered a failure.")]
+    [Tooltip("The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level..")]
     [SerializeField]
-    private int maxSteps = 500;
+    private int maxSteps = 50;
     
     /// <summary>
     /// The weapon visual.
@@ -105,23 +105,6 @@ public class Player : Agent
     [field: HideInInspector]
     [field: SerializeField]
     public BehaviorParameters Parameters { get; private set; }
-    
-    /// <summary>
-    /// How long in seconds to time out the agent if they get stuck in the same spot.
-    /// </summary>
-    [Header("Timeout")]
-    [Tooltip("How long in seconds to time out the agent if they get stuck in the same spot.")]
-    [Min(float.Epsilon)]
-    [SerializeField]
-    private float seconds = 10f;
-    
-    /// <summary>
-    /// The minimum distance to move to reset the timeout.
-    /// </summary>
-    [Tooltip("The minimum distance to move to reset the timeout.")]
-    [Min(float.Epsilon)]
-    [SerializeField]
-    private float distance = 0.25f;
     
     /// <summary>
     /// The <see cref="Level"/> this is a part of.
@@ -185,14 +168,9 @@ public class Player : Agent
     private Trainer _trainer;
     
     /// <summary>
-    /// The last position the player was at.
+    /// The current maximum number of steps for this environment.
     /// </summary>
-    private Vector2 _lastPosition;
-    
-    /// <summary>
-    /// The elapsed timeout time.
-    /// </summary>
-    private float _elapsed;
+    private int _maxSteps;
     
     /// <summary>
     /// The current step since accomplishing something.
@@ -345,34 +323,10 @@ public class Player : Agent
         _velocity3 = new(_velocity.x, 0, _velocity.y);
         body.linearVelocity = _velocity3;
         
-        // If this is not in inference mode, add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
-        if (!Parameters.IsInHeuristicMode() && (!Academy.IsInitialized || !Academy.Instance.IsCommunicatorOn))
+        // Add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
+        if (((Academy.IsInitialized && Academy.Instance.IsCommunicatorOn) || _recording) && ++_step >= _maxSteps)
         {
-            return;
-        }
-        
-        // See if we have hit the maximum number of steps.
-        if (++_step >= maxSteps)
-        {
-            CustomEndEpisode(true);
-            return;
-        }
-        
-        // Check our tile.
-        Vector3 p = transform.position;
-        Vector2 p2 = new(p.x, p.z);
-        
-        // If the positions are the same, step the time, stopping if we have been in the same spot for too long.
-        if (Vector2.Distance(p2, _lastPosition) >= distance)
-        {
-            _lastPosition = p2;
-            _elapsed = 0;
-            return;
-        }
-        
-        _elapsed += Time.fixedDeltaTime;
-        if (_elapsed >= seconds)
-        {
+            // See if we have hit the maximum number of steps.
             CustomEndEpisode(true);
         }
     }
@@ -757,10 +711,10 @@ public class Player : Agent
         Previous = Instance.PositionToPercentage(p);
         PreviousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
         
-        // Reset timeout values.
-        _elapsed = 0;
-        _lastPosition = new(p.x, p.z);
+        // Reset the step timeout and calculate how many steps are allowed.
         _step = 0;
+        _maxSteps = maxSteps * Instance.Size;
+        Debug.Log(_maxSteps);
         
         // Set the collider back to regular.
         col.isTrigger = false;

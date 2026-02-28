@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.ML-Agents::Unity.MLAgents.Policies.BehaviorParameters
   m_BrainParameters:
-    VectorObservationSize: 12
+    VectorObservationSize: 10
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
@@ -191,6 +191,8 @@ MonoBehaviour:
   MaxStep: 0
   speed: 3
   rotation: 360
+  penalty: -0.001
+  maxSteps: 50
   weapon: {fileID: 885989617280085127}
   body: {fileID: 4882874150285239862}
   col: {fileID: 7270673213840974002}
