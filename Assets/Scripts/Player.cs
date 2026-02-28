@@ -714,7 +714,6 @@ public class Player : Agent
         // Reset the step timeout and calculate how many steps are allowed.
         _step = 0;
         _maxSteps = maxSteps * Instance.Size;
-        Debug.Log(_maxSteps);
         
         // Set the collider back to regular.
         col.isTrigger = false;
