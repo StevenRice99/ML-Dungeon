@@ -525,7 +525,7 @@ public class Player : Agent
         // To reduce the number of observations, use the weapon indication in two ways.
         // When we don't have the weapon, give the relative coordinates of the weapon pickup.
         // Otherwise, pass [-1, -1] when we do have the weapon.
-        sensor.AddObservation(_hasWeapon ? new(-1f, -1f) : Instance.PositionToPercentage(Instance.Weapon.transform.position));
+        sensor.AddObservation(_hasWeapon || !Instance.Weapon ? new(-1f, -1f) : Instance.PositionToPercentage(Instance.Weapon.transform.position));
         
         // If we have eliminated all enemies, pass [-1, -1] to indicate this.
         // Since we keep track of previous enemy positions, do the same as with our position.
