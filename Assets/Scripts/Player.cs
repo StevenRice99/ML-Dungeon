@@ -53,11 +53,19 @@ public class Player : Agent
     private float rotation = 360f;
     
     /// <summary>
-    /// The penalty for movement cost.
+    /// The passive penalty given every tick.
     /// </summary>
-    [Tooltip("The penalty for movement cost.")]
+    [Header("Rewards")]
+    [Tooltip("The passive penalty given every tick.")]
     [SerializeField]
     private float penalty = -0.001f;
+    
+    /// <summary>
+    /// The multiplier to give for a reward based on how close they got to the objective.
+    /// </summary>
+    [Tooltip("The multiplier to give for a reward based on how close they got to the objective.")]
+    [SerializeField]
+    private float closeness = 0.5f;
     
     /// <summary>
     /// The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level.
@@ -450,7 +458,8 @@ public class Player : Agent
             // If in opposite extremes, such as the player being at [0, 0] and the next objective being at [1, 1], this is zero reward.
             // Otherwise, if somehow, they were right on top of each other, which should never happen as otherwise it wouldn't be a failure to begin with, but this situation would give a reward of one.
             // The maximum possible distance in a 1x1 grid is the diagonal length, being the square root of two.
-            AddReward(Mathf.Clamp01(1f - Vector2.Distance(self, objective) / 1.4142135623730950488f));
+            // Multiply this by the worth of "closeness" to an objective so the agent learns there is a big benefit of actually reaching it, not just getting close.
+            AddReward(Mathf.Clamp01(1f - Vector2.Distance(self, objective) / 1.4142135623730950488f) * closeness);
             
             // Handle if recording.
             if (_recording)
