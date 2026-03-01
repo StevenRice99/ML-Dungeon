@@ -630,36 +630,40 @@ public class Player : Agent
         {
             // See if we should bound values to a trainer.
             bool trainer = _trainer;
-            int maxSize;
+            int defaultMax;
+            int defaultMin;
             float maxWalls;
             int maxEnemies;
             if (trainer)
             {
-                maxSize = _trainer.MaxSize;
+                defaultMax = _trainer.MaxSize;
+                defaultMin = 2;
                 maxWalls = _trainer.MaxWalls;
                 maxEnemies = _trainer.MaxEnemies;
             }
             else
             {
-                maxSize = Instance.Size;
+                defaultMax = Instance.Size;
+                defaultMin = defaultMax;
                 maxWalls = Instance.WallPercent;
                 maxEnemies = Instance.DesiredEnemies;
             }
             
-            int size = (int)_environment.GetWithDefault("size", maxSize);
+            int maxSize = (int)_environment.GetWithDefault("max_size", defaultMax);
+            int minSize = (int)_environment.GetWithDefault("min_size", defaultMin);
             float walls = _environment.GetWithDefault("walls", maxWalls);
             int enemies = (int)_environment.GetWithDefault("enemies", maxEnemies);
             
             // If there is a trainer, ensure we keep randomizing level sizes, even down to smaller ones, to help the model generate.
             if (trainer)
             {
-                Instance.Size = size <= _trainer.MinSize ? _trainer.MinSize : Mathf.Min(Random.Range(_trainer.MinSize, size + 1), maxSize);
+                Instance.Size = Mathf.Min(maxSize <= minSize ? maxSize : Random.Range(minSize, maxSize + 1), _trainer.MaxSize);
                 Instance.WallPercent = Mathf.Min(Random.Range(0f, walls), maxWalls);
                 Instance.DesiredEnemies = Mathf.Min(Random.Range(0, enemies + 1), maxEnemies);
             }
             else
             {
-                Instance.Size = size;
+                Instance.Size = maxSize <= minSize ? maxSize : Random.Range(minSize, maxSize + 1);
                 Instance.WallPercent = walls;
                 Instance.DesiredEnemies = enemies;
             }

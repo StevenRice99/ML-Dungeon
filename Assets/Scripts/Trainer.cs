@@ -25,14 +25,6 @@ public class Trainer : MonoBehaviour
     public int Levels { get; private set; } = 16;
     
     /// <summary>
-    /// The minimum size that <see cref="Level"/> instances can be down to.
-    /// </summary>
-    [field: Tooltip("The minimum size that level instances can be down to.")]
-    [field: Min(2)]
-    [field: SerializeField]
-    public int MinSize { get; private set; } = 10;
-    
-    /// <summary>
     /// The maximum size that <see cref="Level"/> instances can be up to.
     /// </summary>
     [field: Tooltip("The maximum size that level instances can be up to.")]
@@ -57,23 +49,10 @@ public class Trainer : MonoBehaviour
     public int MaxEnemies { get; private set; } = 5;
     
     /// <summary>
-    /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
-    /// </summary>
-    private void OnValidate()
-    {
-        if (MinSize > MaxSize)
-        {
-            (MaxSize, MinSize) = (MinSize, MaxSize);
-        }
-    }
-    
-    /// <summary>
     /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
     /// </summary>
     private void Start()
     {
-        OnValidate();
-        
         // Calculate grid dimensions for a roughly square layout.
         int columns = Mathf.CeilToInt(Mathf.Sqrt(Levels));
         int rows = Mathf.CeilToInt((float)Levels / columns);
