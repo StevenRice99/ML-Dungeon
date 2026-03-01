@@ -76,12 +76,12 @@ public class DungeonSensorInspector : Editor
                     Color cellColor = Color.white; 
                     
                     // Enemy.
-                    if (sensor.Sensed[i, j, 1] > 0.5f)
+                    if (sensor.Sensed[1, i, j] > 0.5f)
                     {
                         cellColor = Color.red;
                     }
                     // Wall.
-                    else if (sensor.Sensed[i, j, 2] > 0.5f)
+                    else if (sensor.Sensed[2, i, j] > 0.5f)
                     {
                         cellColor = Color.black;
                     }
