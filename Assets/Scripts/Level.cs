@@ -203,7 +203,7 @@ public class Level : MonoBehaviour
         int length = distance * 2 + 1;
         
         // Create a 3D array: [width, height, channels]
-        float[,,] localMap = new float[length, length, 3];
+        float[,,] localMap = new float[3, length, length];
         
         HashSet<int2> enemies = new();
         foreach (Enemy enemy in EnemiesActive)
