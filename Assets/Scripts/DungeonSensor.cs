@@ -101,17 +101,17 @@ public class DungeonSensor : SensorComponent, ISensor
     {
         Sensed = player.Instance.SensorMap(size);
         
-        int width = Sensed.GetLength(0);
-        int height = Sensed.GetLength(1);
-        int channels = Sensed.GetLength(2);
+        int channels = Sensed.GetLength(0);
+        int width = Sensed.GetLength(1);
+        int height = Sensed.GetLength(2);
         
         int total = 0;
         
-        for (int i = 0; i < width; i++)
+        for (int i = 0; i < channels; i++)
         {
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < width; j++)
             {
-                for (int k = 0; k < channels; k++)
+                for (int k = 0; k < height; k++)
                 {
                     // Write directly via 3D index so ML-Agents maps it properly
                     writer[i, j, k] = Sensed[i, j, k];

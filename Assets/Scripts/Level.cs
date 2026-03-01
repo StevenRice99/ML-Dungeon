@@ -226,32 +226,32 @@ public class Level : MonoBehaviour
                 {
                     if (enemies.Contains(real))
                     {
-                        // Enemy
-                        localMap[x, y, 0] = 0f;
-                        localMap[x, y, 1] = 1f;
-                        localMap[x, y, 2] = 0f;
+                        // Enemy.
+                        localMap[0, x, y] = 0f;
+                        localMap[1, x, y] = 1f;
+                        localMap[2, x, y] = 0f;
                     }
                     else if (_map != null && _map[real.x, real.y])
                     {
-                        // Empty / Walkable
-                        localMap[x, y, 0] = 1f;
-                        localMap[x, y, 1] = 0f;
-                        localMap[x, y, 2] = 0f;
+                        // Empty.
+                        localMap[0, x, y] = 1f;
+                        localMap[1, x, y] = 0f;
+                        localMap[2, x, y] = 0f;
                     }
                     else
                     {
-                        // Wall
-                        localMap[x, y, 0] = 0f;
-                        localMap[x, y, 1] = 0f;
-                        localMap[x, y, 2] = 1f;
+                        // Wall.
+                        localMap[0, x, y] = 0f;
+                        localMap[1, x, y] = 0f;
+                        localMap[2, x, y] = 1f;
                     }
                 }
                 else
                 {
                     // Out-of-bounds locations default to unwalkable walls.
-                    localMap[x, y, 0] = 0f;
-                    localMap[x, y, 1] = 0f;
-                    localMap[x, y, 2] = 1f; 
+                    localMap[0, x, y] = 0f;
+                    localMap[1, x, y] = 0f;
+                    localMap[2, x, y] = 1f;
                 }
             }
         }
