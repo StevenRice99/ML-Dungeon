@@ -356,7 +356,7 @@ public class Player : Agent
             {
                 _hasWeapon = true;
                 weapon?.SetActive(true);
-                SetReward(1f);
+                AddReward(1f);
                 _step = 0;
             }
             
@@ -386,7 +386,7 @@ public class Player : Agent
         // Otherwise, eliminate the enemy.
         animator.Play(Attack);
         Instance.EliminateEnemy(enemy);
-        SetReward(1f);
+        AddReward(1f);
         _step = 0;
         
         // If this was the last enemy, end the episode.
