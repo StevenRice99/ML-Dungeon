@@ -76,9 +76,7 @@ public class DungeonSensor : SensorComponent, ISensor
     public ObservationSpec GetObservationSpec()
     {
         int dimension = size * 2 + 1;
-        // ML-Agents expects (height, width, channels).
-        // We now have 3 channels: Empty, Enemy, Wall.
-        return ObservationSpec.Visual(dimension, dimension, 3);
+        return ObservationSpec.Visual(3, dimension, dimension);
     }
     
     /// <summary>
