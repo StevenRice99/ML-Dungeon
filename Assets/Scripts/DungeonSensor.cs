@@ -101,13 +101,12 @@ public class DungeonSensor : SensorComponent, ISensor
     {
         Sensed = player.Instance.SensorMap(size);
         
-        int channels = Sensed.GetLength(0);
         int width = Sensed.GetLength(1);
         int height = Sensed.GetLength(2);
         
         int total = 0;
         
-        for (int i = 0; i < channels; i++)
+        for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < width; j++)
             {

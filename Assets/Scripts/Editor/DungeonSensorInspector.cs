@@ -47,8 +47,8 @@ public class DungeonSensorInspector : Editor
             }
             
             // Nothing to do if the data is empty.
-            int a = sensor.Sensed.GetLength(0);
-            int b = sensor.Sensed.GetLength(1);
+            int a = sensor.Sensed.GetLength(1);
+            int b = sensor.Sensed.GetLength(2);
             if (a < 1 || b < 1)
             {
                 return;
