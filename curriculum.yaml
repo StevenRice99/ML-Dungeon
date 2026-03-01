@@ -77,17 +77,10 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 100
           threshold: 0.9
-        value: 10.0
+        value: 15.0
       - name: Medium
-        completion_criteria:
-          measure: reward
-          behavior: DungeonPlayer
-          signal_smoothing: true
-          min_lesson_length: 100
-          threshold: 1.5
         value: 20.0
       - name: Hard
-        value: 30.0
   walls:
     curriculum:
       - name: Easy
@@ -97,16 +90,8 @@ environment_parameters:
           signal_smoothing: true
           min_lesson_length: 100
           threshold: 0.9
-        value: 0.0
-      - name: Medium
-        completion_criteria:
-          measure: reward
-          behavior: DungeonPlayer
-          signal_smoothing: true
-          min_lesson_length: 100
-          threshold: 1.5
         value: 0.1
-      - name: Hard
+      - name: Medium
         value: 0.2
   enemies:
     curriculum:
@@ -127,7 +112,7 @@ environment_parameters:
           threshold: 1.5
         value: 1.0
       - name: Hard
-        value: 3.0
+        value: 2.0
 checkpoint_settings:
   run_id: dungeon_player_curriculum
   initialize_from: null

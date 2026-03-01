@@ -655,8 +655,8 @@ public class Player : Agent
             {
                 defaultMax = _trainer.MaxSize;
                 defaultMin = 2;
-                maxWalls = _trainer.MaxWalls;
-                maxEnemies = _trainer.MaxEnemies;
+                maxWalls = 0.2f;
+                maxEnemies = 2;
             }
             else
             {

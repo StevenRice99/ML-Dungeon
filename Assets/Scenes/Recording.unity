@@ -166,12 +166,12 @@ MonoBehaviour:
   autoScale: 20
   <ManualScale>k__BackingField: 20
   number: 1000
-  <MinSize>k__BackingField: 10
-  <MaxSize>k__BackingField: 30
+  <MinSize>k__BackingField: 2
+  <MaxSize>k__BackingField: 20
   <MinWalls>k__BackingField: 0
   <MaxWalls>k__BackingField: 0.2
   <MinEnemies>k__BackingField: 0
-  <MaxEnemies>k__BackingField: 3
+  <MaxEnemies>k__BackingField: 2
 --- !u!1 &1667030701
 GameObject:
   m_ObjectHideFlags: 0

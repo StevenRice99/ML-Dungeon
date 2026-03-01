@@ -30,23 +30,7 @@ public class Trainer : MonoBehaviour
     [field: Tooltip("The maximum size that level instances can be up to.")]
     [field: Min(2)]
     [field: SerializeField]
-    public int MaxSize { get; private set; } = 30;
-    
-    /// <summary>
-    /// The maximum wall percentage that can be spawned in any scenario.
-    /// </summary>
-    [field: Tooltip("The maximum wall percentage that can be spawned in any scenario.")]
-    [field: Range(0f, 1f)]
-    [field: SerializeField]
-    public float MaxWalls { get; private set; } = 0.2f;
-    
-    /// <summary>
-    /// The maximum amount of enemies that can be spawned in any scenario.
-    /// </summary>
-    [field: Tooltip("The maximum amount of enemies that can be spawned in any scenario.")]
-    [field: Min(0)]
-    [field: SerializeField]
-    public int MaxEnemies { get; private set; } = 5;
+    public int MaxSize { get; private set; } = 20;
     
     /// <summary>
     /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.

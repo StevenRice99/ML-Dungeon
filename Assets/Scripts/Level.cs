@@ -51,7 +51,7 @@ public class Level : MonoBehaviour
     [Tooltip("What percentage of floors to try turning into walls.")]
     [Range(0f, 1f)]
     [SerializeField]
-    private float wallPercent = 0.1f;
+    private float wallPercent = 0.15f;
     
     /// <summary>
     /// The number of enemies to attempt to spawn.
@@ -68,7 +68,7 @@ public class Level : MonoBehaviour
     [Tooltip("The number of enemies to attempt to spawn.")]
     [Min(0)]
     [SerializeField]
-    private int desiredEnemies = 3;
+    private int desiredEnemies = 1;
     
     /// <summary>
     /// The spacing of pieces of the level.
