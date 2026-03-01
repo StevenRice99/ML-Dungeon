@@ -45,7 +45,7 @@ public class CameraLevel : CameraHandler
         _recording = FindAnyObjectByType<Recording>(FindObjectsInactive.Include);
         
         // Ensure no NULL models.
-        models = models.Where(x => x != null).ToArray();
+        models = models?.Where(x => x != null).ToArray();
     }
     
     /// <summary>
