@@ -189,38 +189,30 @@ public class Level : MonoBehaviour
     
     /// <summary>
     /// Get a <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.<br/>
-    /// Unwalkable = 1<br/>
-    /// Walkable = 0.5<br/>
-    /// Walkable but has an enemy = 0
+    /// Channel 0: 1 if Empty, 0 otherwise.<br/>
+    /// Channel 1: 1 if Enemy, 0 otherwise.<br/>
+    /// Channel 2: 1 if Wall/Out-of-bounds, 0 otherwise.
     /// </summary>
     /// <param name="distance">How many locations away can the relative map see.</param>
     /// <returns>The <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away.</returns>
-    public float[,] SensorMap(int distance)
+    public float[,,] SensorMap(int distance)
     {
         int2 coordinates = PositionToIndex(Agent.transform.position);
         
         // Calculate the dimension of the square grid.
         int length = distance * 2 + 1;
-        float[,] localMap = new float[length, length];
-
+        
+        // Create a 3D array: [width, height, channels]
+        float[,,] localMap = new float[length, length, 3];
+        
         HashSet<int2> enemies = new();
         foreach (Enemy enemy in EnemiesActive)
         {
             enemies.Add(PositionToIndex(enemy.transform.position));
         }
         
-        int a;
-        int b;
-        if (_map != null)
-        {
-            a = _map.GetLength(0);
-            b = _map.GetLength(1);
-        }
-        else
-        {
-            a = 0;
-            b = 0;
-        }
+        int a = _map?.GetLength(0) ?? 0;
+        int b = _map?.GetLength(1) ?? 0;
         
         for (int x = 0; x < length; x++)
         {
@@ -232,12 +224,34 @@ public class Level : MonoBehaviour
                 // Check if the calculated global coordinates are within bounds.
                 if (real.x >= 0 && real.x < a && real.y >= 0 && real.y < b)
                 {
-                    localMap[x, y] = enemies.Contains(real) ? 0f : _map != null && _map[real.x, real.y] ? 0.5f : 1f;
+                    if (enemies.Contains(real))
+                    {
+                        // Enemy
+                        localMap[x, y, 0] = 0f;
+                        localMap[x, y, 1] = 1f;
+                        localMap[x, y, 2] = 0f;
+                    }
+                    else if (_map != null && _map[real.x, real.y])
+                    {
+                        // Empty / Walkable
+                        localMap[x, y, 0] = 1f;
+                        localMap[x, y, 1] = 0f;
+                        localMap[x, y, 2] = 0f;
+                    }
+                    else
+                    {
+                        // Wall
+                        localMap[x, y, 0] = 0f;
+                        localMap[x, y, 1] = 0f;
+                        localMap[x, y, 2] = 1f;
+                    }
                 }
                 else
                 {
-                    // Out-of-bounds locations default to unwalkable.
-                    localMap[x, y] = 1f; 
+                    // Out-of-bounds locations default to unwalkable walls.
+                    localMap[x, y, 0] = 0f;
+                    localMap[x, y, 1] = 0f;
+                    localMap[x, y, 2] = 1f; 
                 }
             }
         }

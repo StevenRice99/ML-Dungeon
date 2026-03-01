@@ -363,9 +363,7 @@ MonoBehaviour:
   <Levels>k__BackingField: 16
   <MinSize>k__BackingField: 10
   <MaxSize>k__BackingField: 30
-  <MinWalls>k__BackingField: 0
   <MaxWalls>k__BackingField: 0.2
-  <MinEnemies>k__BackingField: 0
   <MaxEnemies>k__BackingField: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

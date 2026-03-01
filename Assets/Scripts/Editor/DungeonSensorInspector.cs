@@ -72,6 +72,20 @@ public class DungeonSensorInspector : Editor
                 
                 for (int j = 0; j < b; j++)
                 {
+                    // Default to empty.
+                    Color cellColor = Color.white; 
+                    
+                    // Enemy.
+                    if (sensor.Sensed[i, j, 1] > 0.5f)
+                    {
+                        cellColor = Color.red;
+                    }
+                    // Wall.
+                    else if (sensor.Sensed[i, j, 2] > 0.5f)
+                    {
+                        cellColor = Color.black;
+                    }
+                    
                     row.Add(new()
                     {
                         style =
@@ -79,14 +93,7 @@ public class DungeonSensorInspector : Editor
                             // Apply strict width and height to force a square.
                             width = cellSize,
                             height = cellSize,
-                            
-                            // Evaluate the sensed value and assign the correct background color.
-                            backgroundColor = sensor.Sensed[i, j] switch
-                            {
-                                <= 0.25f => Color.red,
-                                >= 0.75f => Color.black,
-                                _ => Color.white
-                            }
+                            backgroundColor = cellColor
                         }
                     });
                 }
@@ -94,7 +101,6 @@ public class DungeonSensorInspector : Editor
                 visualization.Add(row);
             }
         }).Every(16);
-        
         return root;
     }
 }

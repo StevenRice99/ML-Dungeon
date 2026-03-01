@@ -27,9 +27,9 @@ public class DungeonSensor : SensorComponent, ISensor
     private Player player;
     
     /// <summary>
-    /// The last sensed data.
+    /// The last sensed data. Updated to a 3D array for 3-channel one-hot encoding.
     /// </summary>
-    public float[,] Sensed { get; private set; }
+    public float[,,] Sensed { get; private set; }
     
     /// <summary>
     /// Editor-only function that Unity calls when the script is loaded or a value changes in the Inspector.
@@ -40,7 +40,7 @@ public class DungeonSensor : SensorComponent, ISensor
     }
     
     /// <summary>
-    /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time. This function can be a coroutine.
+    /// Start is called on the frame when a script is enabled just before any of the Update methods are called the first time.
     /// </summary>
     private void Start()
     {
@@ -60,86 +60,78 @@ public class DungeonSensor : SensorComponent, ISensor
     
     /// <summary>
     /// The number of steps in each direction to collect for the sensor.
-    /// This will create a sensor of "(size * 2) + 1".
-    /// In the "trainer_config.yaml" under the "network_settings", the "vis_encode_type" must be set to a model which can take these inputs. Their minimum sizes are below:"<br/>
-    /// match3 - 5x5 - This must be at least 3 to use this.<br/>
-    /// resnet - 15x15 - This must be at least 7 to use this.<br/>
-    /// simple - 20x20 - This must be at least 10 to use this.<br/>
-    /// nature_cnn - 36x36 - This must be at least 18 to use this.<br/>
     /// </summary>
-    [Tooltip("The number of steps in each direction to collect for the sensor. " +
-             "This will create a sensor of \"(size * 2) + 1\". " +
-             "In the \"trainer_config.yaml\" under the \"network_settings\", the \"vis_encode_type\" must be set to a model which can take these inputs. Their minimum sizes are below:\n" +
-             "match3 - 5x5 - This must be at least 3 to use this.\n" +
-             "resnet - 15x15 - This must be at least 7 to use this.\n" +
-             "simple - 20x20 - This must be at least 10 to use this.\n" +
-             "nature_cnn - 36x36 - This must be at least 18 to use this.")]
+    [Tooltip("The number of steps in each direction to collect for the sensor...")]
     [SerializeField]
     private int size = 10;
     
     /// <summary>
     /// Create the sensors, being just this.
     /// </summary>
-    /// <returns>This sensor.</returns>
     public override ISensor[] CreateSensors() => new ISensor[] { this };
     
     /// <summary>
     /// Get the size of this visual sensor.
     /// </summary>
-    /// <returns></returns>
     public ObservationSpec GetObservationSpec()
     {
         int dimension = size * 2 + 1;
-        return ObservationSpec.Visual(1, dimension, dimension);
+        // ML-Agents expects (height, width, channels).
+        // We now have 3 channels: Empty, Enemy, Wall.
+        return ObservationSpec.Visual(dimension, dimension, 3);
     }
     
     /// <summary>
     /// Indicate that this sensor cannot be compressed.
     /// </summary>
-    /// <returns>The default specification which states this cannot be compressed.</returns>
     public CompressionSpec GetCompressionSpec() => CompressionSpec.Default();
     
     /// <summary>
     /// Give the compressed version which is nothing for this sensor.
     /// </summary>
-    /// <returns>NULL.</returns>
     public byte[] GetCompressedObservation() => null;
     
     /// <summary>
     /// Get the unique name to use for sensor collection.
     /// </summary>
-    /// <returns>The unique name to use for sensor collection.</returns>
     public string GetName() => identifier;
     
     /// <summary>
     /// Write the sensor data.
     /// </summary>
-    /// <param name="writer">The observations to write to.</param>
-    /// <returns>The number of points written.</returns>
     public int Write(ObservationWriter writer)
     {
         Sensed = player.Instance.SensorMap(size);
-        int a = Sensed.GetLength(0);
-        int b = Sensed.GetLength(1);
+        
+        int width = Sensed.GetLength(0);
+        int height = Sensed.GetLength(1);
+        int channels = Sensed.GetLength(2);
+        
         int total = 0;
-        for (int i = 0; i < a; i++)
+        
+        for (int i = 0; i < width; i++)
         {
-            for (int j = 0; j < b; j++)
+            for (int j = 0; j < height; j++)
             {
-                writer[total++] = Sensed[i, j];
+                for (int k = 0; k < channels; k++)
+                {
+                    // Write directly via 3D index so ML-Agents maps it properly
+                    writer[i, j, k] = Sensed[i, j, k];
+                    total++;
+                }
             }
         }
         
-        return a * b;
+        return total;
     }
     
     /// <summary>
-    /// Update any internal state of the sensor. This is called once per each agent step.
+    /// Update any internal state of the sensor.
     /// </summary>
     public void Update() { }
     
     /// <summary>
-    /// Resets the internal state of the sensor. This is called at the end of an Agent's episode. Most implementations can leave this empty.
+    /// Resets the internal state of the sensor.
     /// </summary>
     public void Reset() { }
 }
