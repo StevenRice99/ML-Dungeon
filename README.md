@@ -51,7 +51,7 @@ The agent's actions are simply movement along both the horizontal and vertical a
 
 ## Agent Training
 
-The agent was trained across several configurations with [Proximal Policy Optimization (PPO)](https://doi.org/10.48550/arXiv.1707.06347 "Proximal Policy Optimization Algorithms"), [training curriculum](#curriculum-learning "Curriculum Learning"), a [curiosity reward signal](https://doi.org/10.48550/arXiv.1705.05363 "Curiosity-driven Exploration by Self-supervised Prediction") to encourage exploration, and imitation learning, being both Behavioral Cloning (BC) and [Generative Adversarial Imitation Learning (GAIL)](https://doi.org/10.48550/arXiv.1606.03476 "Generative Adversarial Imitation Learning"). The [demonstrations](#demonstration-recording "Demonstration Recording") for imitation learning were recorded using the [heuristic agent](#heuristic-agent "Heuristic Agent"). Both the [heuristic agent](#heuristic-agent "Heuristic Agent") and details on the [demonstrations recorded](#demonstration-recording "Demonstration Recording") are in their sections below.
+The agent was trained with [Proximal Policy Optimization (PPO)](https://doi.org/10.48550/arXiv.1707.06347 "Proximal Policy Optimization Algorithms"), [training curriculum](#curriculum-learning "Curriculum Learning"), a [curiosity reward signal](https://doi.org/10.48550/arXiv.1705.05363 "Curiosity-driven Exploration by Self-supervised Prediction") to encourage exploration, and imitation learning, being both Behavioral Cloning (BC) and [Generative Adversarial Imitation Learning (GAIL)](https://doi.org/10.48550/arXiv.1606.03476 "Generative Adversarial Imitation Learning"). The [demonstrations](#demonstration-recording "Demonstration Recording") for imitation learning were recorded using the [heuristic agent](#heuristic-agent "Heuristic Agent"). Both the [heuristic agent](#heuristic-agent "Heuristic Agent") and details on the [demonstrations recorded](#demonstration-recording "Demonstration Recording") are in their sections below.
 
 ### Heuristic Agent
 
@@ -111,10 +111,7 @@ To train the agent, you can either read the [Unity ML-Agents documentation](http
 
 The helper files have been made for Windows and you must [install uv](https://docs.astral.sh/uv/#installation "UV Installation"). One installed, from the top menu of the Unity editor, you can select `ML-Dungeon` followed by the desired command to run.
 
-- `Behavioral Cloning` - This will train a model purely on the captured demonstrations.
-- `Fine-Tuned` - After running the behavioral cloning, this will then train the model further using reinforcement learning, directly jumping to the "Hard" configuration of the [curriculum learning](#curriculum-learning "Curriculum Learning").
-- `Curriculum Learning` - This will train a reinforcement learning model from scratch using [curriculum learning](#curriculum-learning "Curriculum Learning").
-- `Fine-Tuned and Curriculum Learning` - After running the behavioral cloning, this will then train the model further using reinforcement learning using [curriculum learning](#curriculum-learning "Curriculum Learning").
+- `Train` - Run training.
 - `TensorBoard` - This will open your browser to see the [TensorBoard](https://www.tensorflow.org/tensorboard "TensorBoard") logs of the training of all models.
 - `Install` - If you have [uv](https://docs.astral.sh/uv "uv") installed for Python, this will set up your environment for running all other commands.
 - `Activate` - This will open a terminal in your [uv](https://docs.astral.sh/uv "uv") Python virtual environment for this project, allowing you to run other commands.

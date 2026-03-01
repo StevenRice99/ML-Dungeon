@@ -13,55 +13,28 @@ using Debug = UnityEngine.Debug;
 public static class TrainingRunner
 {
     /// <summary>
-    /// Run behavioural cloning.
+    /// Run training.
     /// </summary>
-    [MenuItem("ML-Dungeon/Behavioral Cloning", false, 0)]
-    public static void BehavioralCloning()
+    [MenuItem("ML-Dungeon/Train", false, 0)]
+    public static void Train()
     {
-        RunScript("Pretrain.bat");
-    }
-    
-    /// <summary>
-    /// Run fine-tuning.
-    /// </summary>
-    [MenuItem("ML-Dungeon/Fine-Tuned", false, 1)]
-    public static void FineTuned()
-    {
-        RunScript("Tune.bat");
-    }
-    
-    /// <summary>
-    /// Run curriculum learning.
-    /// </summary>
-    [MenuItem("ML-Dungeon/Curriculum Learning", false, 2)]
-    public static void CurriculumLearning()
-    {
-        RunScript("Curriculum.bat");
-    }
-    
-    /// <summary>
-    /// Run fine-tuning and curriculum learning.
-    /// </summary>
-    [MenuItem("ML-Dungeon/Fine-Tuned and Curriculum Learning", false, 3)]
-    public static void FineTunedCurriculumLearning()
-    {
-        RunScript("Full.bat");
+        RunScript("Train.bat");
     }
     
     /// <summary>
     /// Monitor the learning in TensorBoard.
     /// </summary>
-    [MenuItem("ML-Dungeon/TensorBoard", false, 14)]
+    [MenuItem("ML-Dungeon/TensorBoard", false, 12)]
     public static void TensorBoard()
     {
-        RunScript("Monitor.bat");
+        RunScript("TensorBoard.bat");
         Application.OpenURL("http://localhost:6006");
     }
     
     /// <summary>
     /// Install a Python environment.
     /// </summary>
-    [MenuItem("ML-Dungeon/Install", false, 25)]
+    [MenuItem("ML-Dungeon/Install", false, 23)]
     public static void Install()
     {
         RunScript("Install.bat");
@@ -70,7 +43,7 @@ public static class TrainingRunner
     /// <summary>
     /// Activate the Python environment.
     /// </summary>
-    [MenuItem("ML-Dungeon/Activate", false, 26)]
+    [MenuItem("ML-Dungeon/Activate", false, 24)]
     public static void Activate()
     {
         RunScript("Activate.bat");
