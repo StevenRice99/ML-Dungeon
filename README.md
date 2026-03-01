@@ -35,18 +35,19 @@ The purpose is this project is for use as a learning resources for [Unity ML-Age
 
 ## Agent Design
 
-The agent's actions are simply movement along both the horizontal and vertical axes. In order to allow the agent to be able to play dungeons of all sizes, environment inputs had to be carefully crafted. The goal was to give as few inputs as possible, and ensure all inputs were normalized between `[0, 1]`, with a few special cases giving readings in `[-1, 1]` which are noted below. The internal architecture of the agent's brain is two layers of 128 neurons.
+The agent's actions are simply movement along both the horizontal and vertical axes. In order to allow the agent to be able to play dungeons of all sizes, environment inputs had to be carefully crafted. The goal was to give as few inputs as possible, and ensure all inputs were normalized between `[0, 1]`, with a few special cases giving readings in `[-1, 1]` which are noted below. The internal architecture of the agent's brain is two layers of 256 neurons.
 
-1. **Agent position** - The agent's current position in the dungeon is given along both the horizontal and vertical axes each in the range of `[0, 1]`.
-2. **Chest position** - Same as the agent's position but for the chest that gives the agent a sword. If the agent has already reached the chest and obtained the sword, these inputs are given as `[-1, 1]` to the agent instead of the position of the chest. This was done to instead of adding another boolean input in addition to the chest coordinates, as given the chest's position becomes irrelevant to the agent once the sword is obtained, this allows us to reduce the input size.
-3. **Nearest enemy's position** - Same as the chest's position where it will give the positon of the nearest enemy if there are any, or `[-1, 1]` if there are no more enemies in the level. This again was done to avoid needing to add another boolean input to signify the existence of any enemies.
-4. **Local area map** - A local visual encoding of the local area of the world for the agent to navigate around local obstacles. This encodes a square of the local area consisting the agent's current dungeon tile as well as ten tiles in each direction. This creates a `21×21` grid which is encoded as a visual tensor, utilizing the `match3` Convolutional Neural Network (CNN) model based on the work ["Human-Like Playtesting with Deep Learning" by Gudmundsoon et al.](https://doi.org/10.1109/CIG.2018.8490442 "Human-Like Playtesting with Deep Learning") This CNN model was chosen as it "is a smaller CNN that can capture more granular spatial relationships and is optimized for board games", and the encoding we utilize is very efficient. The world is encoded in a one-hot manner across `3` channels to denote if the cell is empty, is a wall, or contains an enemy.
+1. **Agent position** - Both the agent's previous and current positions in the dungeon are given along both the horizontal and vertical axes each in the range of `[0, 1]`.
+2. **Chest position** - Position of the chest, or `[-1, -1]` if obtained. If the agent has already reached the chest and obtained the sword, these inputs are given as `[-1, -1]` to the agent instead of the position of the chest. This was done to instead of adding another boolean input in addition to the chest coordinates, as given the chest's position becomes irrelevant to the agent once the sword is obtained, this allows us to reduce the input size.
+3. **Nearest enemy's position** - Same as the agent's position but for the previous and current positions of the nearest enemy if there are any, or `[-1, -1]` if there are no more enemies in the level. This again was done to avoid needing to add another boolean input to signify the existence of any enemies.
+4. **Local area map** - A local visual encoding of the local area of the world for the agent to navigate around local obstacles. This encodes a square of the local area consisting the agent's current dungeon tile as well as ten tiles in each direction. This creates a `21×21` grid which is encoded as a visual tensor, utilizing the `match3` Convolutional Neural Network (CNN) model based on the work ["Human-Like Playtesting with Deep Learning" by Gudmundsoon et al.](https://doi.org/10.1109/CIG.2018.8490442 "Human-Like Playtesting with Deep Learning") This CNN model was chosen as it "is a smaller CNN that can capture more granular spatial relationships and is optimized for board games", and the encoding we utilize is very efficient. The world is encoded across `3` channels to denote if the cell is walkable, contains an enemy, or contains the weapon pickup.
 
 ## Agent Rewards
 
 - A reward of `1` is given for reaching the weapon pickup.
 - A reward of `1` is given for eliminating an enemy.
 - A penalty of `-1` is given for being eliminated by an enemy.
+- A shaping reward of up to `0.1` is given for moving towards the current objective (the weapon pickup if not held, otherwise the nearest enemy), or a penalty for moving away.
 
 ## Agent Training
 
@@ -63,28 +64,28 @@ All navigation is done by finding a path using A\* on the navigation mesh of the
 
 ### Demonstration Recording
 
-The demonstration recording of the [heuristic agent](#heuristic-agent "Heuristic Agent") is done for a set number of trials across given dungeon parameters. A separate recording is made for each trial, with a recording being discarded in the event that the [heuristic agent](#heuristic-agent "Heuristic Agent") fails the level by being eliminated by an enemy. Demonstrations were run for a hundred thousand trials, each which had to following configurations:
+The demonstration recording of the [heuristic agent](#heuristic-agent "Heuristic Agent") is done for a set number of trials across given dungeon parameters. A separate recording is made for each trial, with a recording being discarded in the event that the [heuristic agent](#heuristic-agent "Heuristic Agent") fails the level by being eliminated by an enemy. Demonstrations were run for a thousand trials, each which had to following configurations:
 
 - Size = `[10, 30]`
 - Walls = `[0%, 20%]`
-- Enemies = `[0, 3]`
+- Enemies = `[0, 5]`
 
 ### Curriculum Learning
 
 There were three levels to the training, each allowing for more complex levels. To ensure generalization, agents would also be tested the lower-complexity levels in when in higher curriculums. The different curriculum levels were:
 
 1. Easy
-   - Size = `10`
-   - Walls = `0%`
+   - Size = `[2, 15]`
+   - Walls = `[0%, 10%]`
    - Enemies = `0`
 2. Medium
    - Size = `[10, 20]`
-   - Walls = `[0%, 10%]`
+   - Walls = `[0%, 20%]`
    - Enemies = `[0, 1]`
 3. Hard
-   - Size = `[10, 30]`
+   - Size = `[10, 20]`
    - Walls = `[0%, 20%]`
-   - Enemies = `[1, 3]`
+   - Enemies = `[0, 2]`
 
 ## Results
 
