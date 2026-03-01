@@ -53,21 +53,6 @@ public class Player : Agent
     private float rotation = 360f;
     
     /// <summary>
-    /// The passive penalty given every tick.
-    /// </summary>
-    [Header("Rewards")]
-    [Tooltip("The passive penalty given every tick.")]
-    [SerializeField]
-    private float penalty = -0.001f;
-    
-    /// <summary>
-    /// The multiplier to give for a reward based on how close they got to the objective.
-    /// </summary>
-    [Tooltip("The multiplier to give for a reward based on how close they got to the objective.")]
-    [SerializeField]
-    private float closeness = 0.5f;
-    
-    /// <summary>
     /// The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level.
     /// </summary>
     [Tooltip("The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level..")]
@@ -325,7 +310,6 @@ public class Player : Agent
     /// </summary>
     private void FixedUpdate()
     {
-        AddReward(penalty);
         RequestDecision();
         _velocity = _movement.normalized * speed;
         _velocity3 = new(_velocity.x, 0, _velocity.y);
@@ -415,52 +399,6 @@ public class Player : Agent
     {
         if (failure)
         {
-            // When we failed, get the distance to the next goal to give a partial reward based on how close we got.
-            Vector3 self3 = transform.position;
-            Vector2 self = new(self3.x, self3.z);
-            Vector2 objective;
-            if (_hasWeapon)
-            {
-                Enemy nearest = Instance.EnemiesActive.OrderBy(x =>
-                {
-                    Vector3 p = x.transform.position;
-                    return Vector2.Distance(self, new(p.x, p.z));
-                }).FirstOrDefault();
-                if (nearest)
-                {
-                    Vector3 objective3 = nearest.transform.position;
-                    objective = new(objective3.x, objective3.z);
-                }
-                else
-                {
-                    objective = self;
-                }
-            }
-            else
-            {
-                GameObject w = Instance.Weapon;
-                if (w)
-                {
-                    Vector3 objective3 = Instance.Weapon.transform.position;
-                    objective = new(objective3.x, objective3.z);
-                }
-                else
-                {
-                    objective = self;
-                }
-            }
-            
-            // Get the points as relative coordinates to the level, with each axis being from [0, 1].
-            self = Instance.PositionToPercentage(self);
-            objective = Instance.PositionToPercentage(objective);
-            
-            // Add a relative reward based on how close the agent got to their next objective.
-            // If in opposite extremes, such as the player being at [0, 0] and the next objective being at [1, 1], this is zero reward.
-            // Otherwise, if somehow, they were right on top of each other, which should never happen as otherwise it wouldn't be a failure to begin with, but this situation would give a reward of one.
-            // The maximum possible distance in a 1x1 grid is the diagonal length, being the square root of two.
-            // Multiply this by the worth of "closeness" to an objective so the agent learns there is a big benefit of actually reaching it, not just getting close.
-            AddReward(Mathf.Clamp01(1f - Vector2.Distance(self, objective) / 1.4142135623730950488f) * closeness);
-            
             // Handle if recording.
             if (_recording)
             {
