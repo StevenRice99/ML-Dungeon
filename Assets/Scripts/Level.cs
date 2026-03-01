@@ -189,10 +189,9 @@ public class Level : MonoBehaviour
     
     /// <summary>
     /// Get a <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.<br/>
-    /// Channel 0: 1 if Empty, 0 otherwise.<br/>
+    /// Channel 0: 1 if Walkable, 0 otherwise.<br/>
     /// Channel 1: 1 if Enemy, 0 otherwise.<br/>
-    /// Channel 2: 1 if Wall/Out-of-bounds, 0 otherwise.<br/>
-    /// Channel 3: 1 if Weapon, 0 otherwise.
+    /// Channel 2: 1 if Weapon, 0 otherwise.
     /// </summary>
     /// <param name="distance">How many locations away can the relative map see.</param>
     /// <returns>The <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away.</returns>
@@ -204,7 +203,7 @@ public class Level : MonoBehaviour
         int length = distance * 2 + 1;
         
         // Create a 3D array: [width, height, channels]
-        float[,,] localMap = new float[4, length, length];
+        float[,,] localMap = new float[3, length, length];
         
         HashSet<int2> enemies = new();
         foreach (Enemy enemy in EnemiesActive)
@@ -227,46 +226,23 @@ public class Level : MonoBehaviour
                 // Check if the calculated global coordinates are within bounds.
                 if (real.x >= 0 && real.x < a && real.y >= 0 && real.y < b)
                 {
-                    if (enemies.Contains(real))
-                    {
-                        // Enemy.
-                        localMap[0, x, y] = 0f;
-                        localMap[1, x, y] = 1f;
-                        localMap[2, x, y] = 0f;
-                        localMap[3, x, y] = 0f;
-                    }
-                    else if (real.x == weaponPos.x && real.y == weaponPos.y)
-                    {
-                        // Weapon.
-                        localMap[0, x, y] = 0f;
-                        localMap[1, x, y] = 0f;
-                        localMap[2, x, y] = 0f;
-                        localMap[3, x, y] = 1f;
-                    }
-                    else if (_map != null && _map[real.x, real.y])
-                    {
-                        // Empty.
-                        localMap[0, x, y] = 1f;
-                        localMap[1, x, y] = 0f;
-                        localMap[2, x, y] = 0f;
-                        localMap[3, x, y] = 0f;
-                    }
-                    else
-                    {
-                        // Wall.
-                        localMap[0, x, y] = 0f;
-                        localMap[1, x, y] = 0f;
-                        localMap[2, x, y] = 1f;
-                        localMap[3, x, y] = 0f;
-                    }
+                    bool isWalkable = _map != null && _map[real.x, real.y];
+                    
+                    // Channel 0: Walkable floor.
+                    localMap[0, x, y] = isWalkable ? 1f : 0f;
+                    
+                    // Channel 1: Enemy presence.
+                    localMap[1, x, y] = enemies.Contains(real) ? 1f : 0f;
+                    
+                    // Channel 2: Weapon presence.
+                    localMap[2, x, y] = (real.x == weaponPos.x && real.y == weaponPos.y) ? 1f : 0f;
                 }
                 else
                 {
-                    // Out-of-bounds locations default to unwalkable walls.
+                    // Out-of-bounds locations default to unwalkable walls (0 on all channels).
                     localMap[0, x, y] = 0f;
                     localMap[1, x, y] = 0f;
-                    localMap[2, x, y] = 1f;
-                    localMap[3, x, y] = 0f;
+                    localMap[2, x, y] = 0f;
                 }
             }
         }

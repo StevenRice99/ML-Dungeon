@@ -76,7 +76,7 @@ public class DungeonSensor : SensorComponent, ISensor
     public ObservationSpec GetObservationSpec()
     {
         int dimension = size * 2 + 1;
-        return ObservationSpec.Visual(4, dimension, dimension);
+        return ObservationSpec.Visual(3, dimension, dimension);
     }
     
     /// <summary>
@@ -106,13 +106,12 @@ public class DungeonSensor : SensorComponent, ISensor
         
         int total = 0;
         
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < width; j++)
             {
                 for (int k = 0; k < height; k++)
                 {
-                    // Write directly via 3D index so ML-Agents maps it properly
                     writer[i, j, k] = Sensed[i, j, k];
                     total++;
                 }

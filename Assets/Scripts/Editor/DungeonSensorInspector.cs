@@ -72,22 +72,27 @@ public class DungeonSensorInspector : Editor
                 
                 for (int j = 0; j < b; j++)
                 {
-                    // Default to empty.
-                    Color cellColor = Color.white; 
+                    Color cellColor;
                     
+                    // Pickup.
+                    if (sensor.Sensed[2, i, j] > 0.5f)
+                    {
+                        cellColor = Color.yellow;
+                    }
                     // Enemy.
-                    if (sensor.Sensed[1, i, j] > 0.5f)
+                    else if (sensor.Sensed[1, i, j] > 0.5f)
                     {
                         cellColor = Color.red;
                     }
-                    // Wall.
-                    else if (sensor.Sensed[2, i, j] > 0.5f)
+                    // Walkable.
+                    else if (sensor.Sensed[0, i, j] > 0.5f)
+                    {
+                        cellColor = Color.white;
+                    }
+                    // Otherwise, a wall or out-of-bounds.
+                    else
                     {
                         cellColor = Color.black;
-                    }
-                    else if (sensor.Sensed[3, i, j] > 0.5f)
-                    {
-                        cellColor = Color.yellow;
                     }
                     
                     row.Add(new()
