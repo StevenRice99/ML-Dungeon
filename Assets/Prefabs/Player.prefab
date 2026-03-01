@@ -191,15 +191,12 @@ MonoBehaviour:
   MaxStep: 0
   speed: 3
   rotation: 360
-  penalty: -0.001
-  maxSteps: 50
+  maxSteps: 100
   weapon: {fileID: 885989617280085127}
   body: {fileID: 4882874150285239862}
   col: {fileID: 7270673213840974002}
   animator: {fileID: 8377096403809976827}
   <Parameters>k__BackingField: {fileID: -3681100737196805247}
-  seconds: 10
-  distance: 0.25
 --- !u!114 &3647032134443820843
 MonoBehaviour:
   m_ObjectHideFlags: 0

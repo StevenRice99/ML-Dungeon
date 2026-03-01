@@ -16,8 +16,8 @@ behaviors:
       shared_critic: False
     network_settings:
       vis_encode_type: match3
-      normalize: false
-      hidden_units: 128
+      normalize: true
+      hidden_units: 256
       num_layers: 2
     max_steps: 3000000
     time_horizon: 64

@@ -208,10 +208,10 @@ public class CameraLevel : CameraHandler
         y += h + x;
         GUI.Label(new(xr, y, w, h), $"Score: {_level.Agent.GetCumulativeReward()}");
         y += h + x;
-        GUI.Label(new(xr, y, w, h), $"Position: {_level.Agent.Previous}");
+        GUI.Label(new(xr, y, w, h), $"Position: {_level.Agent.Position}");
         y += h + x;
         GUI.Label(new(xr, y, w, h), $"Pickup: {_level.Agent.Pickup}");
         y += h + x;
-        GUI.Label(new(xr, y, w, h), $"Enemy: {_level.Agent.PreviousEnemy}");
+        GUI.Label(new(xr, y, w, h), $"Enemy: {_level.Agent.Enemy}");
     }
 }

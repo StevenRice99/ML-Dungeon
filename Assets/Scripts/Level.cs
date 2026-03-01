@@ -191,7 +191,8 @@ public class Level : MonoBehaviour
     /// Get a <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.<br/>
     /// Channel 0: 1 if Empty, 0 otherwise.<br/>
     /// Channel 1: 1 if Enemy, 0 otherwise.<br/>
-    /// Channel 2: 1 if Wall/Out-of-bounds, 0 otherwise.
+    /// Channel 2: 1 if Wall/Out-of-bounds, 0 otherwise.<br/>
+    /// Channel 3: 1 if Weapon, 0 otherwise.
     /// </summary>
     /// <param name="distance">How many locations away can the relative map see.</param>
     /// <returns>The <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away.</returns>
@@ -203,13 +204,15 @@ public class Level : MonoBehaviour
         int length = distance * 2 + 1;
         
         // Create a 3D array: [width, height, channels]
-        float[,,] localMap = new float[3, length, length];
+        float[,,] localMap = new float[4, length, length];
         
         HashSet<int2> enemies = new();
         foreach (Enemy enemy in EnemiesActive)
         {
             enemies.Add(PositionToIndex(enemy.transform.position));
         }
+        
+        int2 weaponPos = Weapon != null && Weapon.activeInHierarchy ? PositionToIndex(Weapon.transform.position) : new(-1, -1);
         
         int a = _map?.GetLength(0) ?? 0;
         int b = _map?.GetLength(1) ?? 0;
@@ -230,6 +233,15 @@ public class Level : MonoBehaviour
                         localMap[0, x, y] = 0f;
                         localMap[1, x, y] = 1f;
                         localMap[2, x, y] = 0f;
+                        localMap[3, x, y] = 0f;
+                    }
+                    else if (real.x == weaponPos.x && real.y == weaponPos.y)
+                    {
+                        // Weapon.
+                        localMap[0, x, y] = 0f;
+                        localMap[1, x, y] = 0f;
+                        localMap[2, x, y] = 0f;
+                        localMap[3, x, y] = 1f;
                     }
                     else if (_map != null && _map[real.x, real.y])
                     {
@@ -237,6 +249,7 @@ public class Level : MonoBehaviour
                         localMap[0, x, y] = 1f;
                         localMap[1, x, y] = 0f;
                         localMap[2, x, y] = 0f;
+                        localMap[3, x, y] = 0f;
                     }
                     else
                     {
@@ -244,6 +257,7 @@ public class Level : MonoBehaviour
                         localMap[0, x, y] = 0f;
                         localMap[1, x, y] = 0f;
                         localMap[2, x, y] = 1f;
+                        localMap[3, x, y] = 0f;
                     }
                 }
                 else
@@ -252,6 +266,7 @@ public class Level : MonoBehaviour
                     localMap[0, x, y] = 0f;
                     localMap[1, x, y] = 0f;
                     localMap[2, x, y] = 1f;
+                    localMap[3, x, y] = 0f;
                 }
             }
         }

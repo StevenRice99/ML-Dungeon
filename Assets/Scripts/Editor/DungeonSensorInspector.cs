@@ -85,6 +85,10 @@ public class DungeonSensorInspector : Editor
                     {
                         cellColor = Color.black;
                     }
+                    else if (sensor.Sensed[3, i, j] > 0.5f)
+                    {
+                        cellColor = Color.yellow;
+                    }
                     
                     row.Add(new()
                     {

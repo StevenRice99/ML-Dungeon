@@ -57,7 +57,7 @@ public class Player : Agent
     /// </summary>
     [Tooltip("The maximum number of steps allowed to be performed between goals before being considered a failure per tile-size of the level..")]
     [SerializeField]
-    private int maxSteps = 50;
+    private int maxSteps = 100;
     
     /// <summary>
     /// The weapon visual.
@@ -138,17 +138,22 @@ public class Player : Agent
     /// <summary>
     /// Our previous relative position in the level.
     /// </summary>
-    public Vector2 Previous { get; private set; }
+    public Vector2 Position { get; private set; }
     
     /// <summary>
     /// The previous relative position of the nearest enemy in the level.
     /// </summary>
-    public Vector2 PreviousEnemy { get; private set; }
+    public Vector2 Enemy { get; private set; }
     
     /// <summary>
     /// The relative position of the weapon.
     /// </summary>
     public Vector2 Pickup { get; private set; }
+    
+    /// <summary>
+    /// The previous distance to the target goal.
+    /// </summary>
+    private float _previousDistance;
     
     /// <summary>
     /// A <see cref="DemonstrationRecorder"/> attached to this.
@@ -320,6 +325,18 @@ public class Player : Agent
         _velocity3 = new(_velocity.x, 0, _velocity.y);
         body.linearVelocity = _velocity3;
         
+        // Add a small reward for moving towards the goal.
+        Vector2 currentPos = Instance.PositionToPercentage(transform.position);
+        float currentDistance = Vector2.Distance(currentPos, _hasWeapon ? Enemy : Pickup);
+        
+        // Only give reward if the target is valid (not [-1, -1]).
+        if (currentDistance < 2f && _previousDistance < 2f)
+        {
+            AddReward((_previousDistance - currentDistance) * 0.1f);
+        }
+        
+        _previousDistance = currentDistance;
+        
         // Add timeouts to prevent any weird cases of getting stuck during demonstration generation or training.
         if (((Academy.IsInitialized && Academy.Instance.IsCommunicatorOn) || _recording) && ++_step >= _maxSteps)
         {
@@ -461,9 +478,9 @@ public class Player : Agent
     public override void CollectObservations([NotNull] VectorSensor sensor)
     {
         // Get our relative position. We pass both the previous and current positions so the agent can tell which way it was moving.
-        sensor.AddObservation(Previous);
-        Previous = Instance.PositionToPercentage(transform.position);
-        sensor.AddObservation(Previous);
+        sensor.AddObservation(Position);
+        Position = Instance.PositionToPercentage(transform.position);
+        sensor.AddObservation(Position);
         
         // To reduce the number of observations, use the weapon indication in two ways.
         // When we don't have the weapon, give the relative coordinates of the weapon pickup.
@@ -481,9 +498,9 @@ public class Player : Agent
         }
         
         // Otherwise, pass the position of the nearest enemy and the previous position.
-        sensor.AddObservation(PreviousEnemy);
-        PreviousEnemy = NearestEnemy();
-        sensor.AddObservation(PreviousEnemy);
+        sensor.AddObservation(Enemy);
+        Enemy = NearestEnemy();
+        sensor.AddObservation(Enemy);
     }
     
     /// <summary>
@@ -673,8 +690,11 @@ public class Player : Agent
         
         // Now that the player is spawned, cache the relative position and enemy position.
         Vector3 p = transform.position;
-        Previous = Instance.PositionToPercentage(p);
-        PreviousEnemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
+        Position = Instance.PositionToPercentage(p);
+        Enemy = Instance.EnemiesCount < 1 ? new(-1f, -1f) : NearestEnemy();
+        
+        // Initialize the distance for reward shaping.
+        _previousDistance = Vector2.Distance(Position, _hasWeapon ? Enemy : Pickup);
         
         // Reset the step timeout and calculate how many steps are allowed.
         _step = 0;
