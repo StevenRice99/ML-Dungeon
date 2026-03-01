@@ -210,6 +210,8 @@ public class CameraLevel : CameraHandler
         y += h + x;
         GUI.Label(new(xr, y, w, h), $"Position: {_level.Agent.Previous}");
         y += h + x;
+        GUI.Label(new(xr, y, w, h), $"Pickup: {_level.Agent.Pickup}");
+        y += h + x;
         GUI.Label(new(xr, y, w, h), $"Enemy: {_level.Agent.PreviousEnemy}");
     }
 }
