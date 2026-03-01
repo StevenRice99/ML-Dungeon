@@ -80,7 +80,6 @@ environment_parameters:
         value: 15.0
       - name: Medium
         value: 20.0
-      - name: Hard
   walls:
     curriculum:
       - name: Easy

@@ -58,10 +58,10 @@ engine_settings:
   no_graphics: true
   no_graphics_monitor: false
 environment_parameters:
-  min_size: 10
-  max_size: 30.0
+  min_size: 2.0
+  max_size: 20.0
   walls: 0.2
-  enemies: 3.0
+  enemies: 2.0
 checkpoint_settings:
   run_id: dungeon_player_pretraining
   initialize_from: null
