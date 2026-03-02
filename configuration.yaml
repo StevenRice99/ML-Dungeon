@@ -101,7 +101,7 @@ environment_parameters:
           behavior: DungeonPlayer
           signal_smoothing: true
           min_lesson_length: 100
-          threshold: 1.5
+          threshold: 1.2
         value: 1.0
       - name: Hard
         value: 2.0

@@ -40,7 +40,7 @@ public class Recording : MonoBehaviour
     [Tooltip("The number of attempts per settings to record.")]
     [Min(1)]
     [SerializeField]
-    private int number = 1000;
+    private int number = 750;
     
     /// <summary>
     /// The minimum size that <see cref="Level"/> instances can be down to.
@@ -48,7 +48,7 @@ public class Recording : MonoBehaviour
     [field: Tooltip("The minimum size that level instances can be down to.")]
     [field: Min(2)]
     [field: SerializeField]
-    public int MinSize { get; private set; } = 10;
+    public int MinSize { get; private set; } = 2;
     
     /// <summary>
     /// The maximum size that <see cref="Level"/> instances can be up to.
