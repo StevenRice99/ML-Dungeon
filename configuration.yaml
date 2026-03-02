@@ -38,10 +38,10 @@ behaviors:
     behavioral_cloning:
       demo_path: Demonstrations/
       strength: 0.2
-      steps: 1000000
+      steps: 2000000
       batch_size: 1024
       num_epoch: 3
-    max_steps: 10000000
+    max_steps: 2000000
     time_horizon: 128
     summary_freq: 50000
     keep_checkpoints: 10
