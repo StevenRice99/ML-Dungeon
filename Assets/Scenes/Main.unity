@@ -315,7 +315,8 @@ MonoBehaviour:
   <Cam>k__BackingField: {fileID: 2056854782}
   <Height>k__BackingField: 10
   extra: 1000
-  models: []
+  models:
+  - {fileID: 5022602860645237092, guid: e36253a6a163dad459d177e40184bca8, type: 3}
 --- !u!1001 &7779330358870851662
 PrefabInstance:
   m_ObjectHideFlags: 0
