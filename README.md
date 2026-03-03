@@ -89,7 +89,8 @@ There were three levels to the training, each allowing for more complex levels. 
 
 ## Results
 
-TODO.
+- The agent demonstrates some basic obstacle avoidance, but struggles with more complex levels and navigation.
+- The agent is not great at avoiding enemies prior to grabbing its weapon.
 
 ## Running
 
