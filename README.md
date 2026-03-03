@@ -19,7 +19,7 @@ Teaching an agent to navigate randomly generated and randomly-sized dungeons wit
 
 ## Purpose
 
-The purpose is this project is for use as a learning resources for [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"), highlighting how different methods can be applied to try and overcome a complex environment. As such, many of the final trained agents in their current states are not very effective.
+The purpose is this project is for use as a learning resources for [Unity ML-Agents](https://docs.unity3d.com/Packages/com.unity.ml-agents@latest "Unity ML-Agents"), highlighting how different methods can be applied to try and overcome a complex environment.
 
 ## Game Overview
 
