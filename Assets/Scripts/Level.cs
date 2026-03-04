@@ -369,7 +369,7 @@ public class Level : MonoBehaviour
             }
         }
         
-        // Place Enemies as far away from the player as possible from true walking distance from the start position using BFS.
+        // Place Enemies as far away from the player as possible.
         int[,] distances = new int[size, size];
         for (int i = 0; i < size; i++)
         {
@@ -394,18 +394,17 @@ public class Level : MonoBehaviour
                 int nx = curr.x + dx[i];
                 int ny = curr.y + dy[i];
                 
-                if (nx >= 0 && nx < size && ny >= 0 && ny < size)
+                if (nx < 0 || nx >= size || ny < 0 || ny >= size || level[nx, ny] == LevelParts.Wall || distances[nx, ny] != -1)
                 {
-                    if (level[nx, ny] != LevelParts.Wall && distances[nx, ny] == -1)
-                    {
-                        distances[nx, ny] = distances[curr.x, curr.y] + 1;
-                        q.Enqueue(new(nx, ny));
-                    }
+                    continue;
                 }
+                
+                distances[nx, ny] = distances[curr.x, curr.y] + 1;
+                q.Enqueue(new(nx, ny));
             }
         }
         
-        // Gather all remaining floors and their distances from the player
+        // Gather all remaining floors and their distances from the player.
         List<KeyValuePair<Vector2Int, int>> floorDistances = new();
         for (int i = 0; i < size; i++)
         {
