@@ -168,26 +168,6 @@ public class Level : MonoBehaviour
     private bool[,] _map;
     
     /// <summary>
-    /// Level data about what areas are walkable, with walkable spaces being true and non-walkable being false.
-    /// </summary>
-    public bool[,] Map
-    {
-        get
-        {
-            bool[,] data = new bool[size, size];
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    data[i, j] = _map[i, j];
-                }
-            }
-            
-            return data;
-        }
-    }
-    
-    /// <summary>
     /// Get a <see cref="_map"/> data centered around the <see cref="Agent"/> which can see a given size away. Any out-of-bounds locations will be returned as un-walkable.<br/>
     /// Channel 0: 1 if Walkable, 0 otherwise.<br/>
     /// Channel 1: 1 if Enemy, 0 otherwise.<br/>
@@ -480,15 +460,14 @@ public class Level : MonoBehaviour
                 int nx = curr.x + dx[i];
                 int ny = curr.y + dy[i];
                 
-                if (nx >= 0 && nx < s && ny >= 0 && ny < s)
+                if (nx < 0 || nx >= s || ny < 0 || ny >= s || visited[nx, ny] || grid[nx, ny] == LevelParts.Wall)
                 {
-                    if (!visited[nx, ny] && grid[nx, ny] != LevelParts.Wall)
-                    {
-                        visited[nx, ny] = true;
-                        reachableCount++;
-                        queue.Enqueue(new(nx, ny));
-                    }
+                    continue;
                 }
+                
+                visited[nx, ny] = true;
+                reachableCount++;
+                queue.Enqueue(new(nx, ny));
             }
         }
         
